@@ -13,6 +13,7 @@
             --soft-gold: #e5c3b3;
             --white: #ffffff;
         }
+
         body {
             font-family: 'Tajawal', sans-serif;
             background-color: var(--primary-purple);
@@ -20,20 +21,45 @@
             margin: 0;
             overflow-x: hidden;
         }
+
         .gold-gradient {
             background: linear-gradient(135deg, var(--accent-gold), var(--soft-gold));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
+
         .bg-gold-gradient {
             background: linear-gradient(135deg, var(--accent-gold), var(--soft-gold));
         }
-        .card-shadow { box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+
+        .card-shadow {
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
         .category-card {
             transition: all 0.3s ease;
             border: 1px solid rgba(194, 141, 117, 0.3);
         }
-        .hidden { display: none !important; }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-gold);
+            background-color: rgba(194, 141, 117, 0.1);
+        }
+
+        .btn-bounce:active {
+            transform: scale(0.95);
+        }
+
+        @keyframes floating {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        .crown-icon {
+            animation: floating 3s ease-in-out infinite;
+        }
+
         #auth-overlay, #loading-overlay {
             background: var(--primary-purple);
             position: fixed;
@@ -42,194 +68,352 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            padding: 20px;
         }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: var(--accent-gold);
+            border-radius: 10px;
+        }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
     <div id="loading-overlay">
         <div class="text-center">
-            <div class="text-6xl mb-4">👑</div>
-            <h2 class="text-2xl font-bold gold-gradient uppercase">Paradise Türk</h2>
+            <div class="crown-icon text-6xl mb-4">👑</div>
+            <h2 class="text-2xl font-bold gold-gradient tracking-widest uppercase">Paradise Türk</h2>
         </div>
     </div>
 
     <div id="auth-overlay" class="hidden">
-        <div class="bg-white/5 border border-white/10 p-8 rounded-3xl shadow-2xl w-full max-w-sm text-center">
-            <h2 class="text-xl font-bold gold-gradient mb-4 uppercase">دخول طلاب باراديس VIP</h2>
-            <input type="email" id="user-email" placeholder="البريد الإلكتروني" class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl mb-4 text-center text-white outline-none">
-            <button onclick="verifyAccess()" class="w-full bg-gold-gradient text-[#4a2b4d] font-bold py-3 rounded-xl">فتح البوابة</button>
+        <div class="bg-white/5 border border-white/10 p-8 rounded-3xl shadow-2xl w-full max-w-sm text-center card-shadow">
+            <div class="crown-icon text-5xl mb-4">👑</div>
+            <h2 class="text-xl font-bold gold-gradient mb-2 uppercase">دخول خاص لطلاب باراديس ترك فقط</h2>
+            <p class="text-gray-400 text-sm mb-6">أدخل البريد المسجل لتفعيل رحلتك</p>
+            
+            <input type="email" id="user-email" placeholder="البريد الإلكتروني" 
+                   class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl mb-4 text-center text-white focus:border-accent-gold outline-none shadow-inner">
+            
+            <button onclick="verifyAccess()" id="login-btn" class="w-full bg-gold-gradient text-[#4a2b4d] font-bold py-3 rounded-xl btn-bounce shadow-lg">
+                فتح البوابة
+            </button>
+            
+            <p id="auth-msg" class="text-red-400 mt-4 text-sm font-bold hidden"></p>
         </div>
     </div>
 
     <div id="app" class="max-w-md mx-auto min-h-screen flex flex-col p-4 pb-20 hidden">
+        
         <header class="flex justify-between items-center py-6">
             <div class="flex flex-col">
-                <h1 class="text-2xl font-bold tracking-tighter uppercase">PARADISE<span class="text-[#c28d75]">TÜRK</span></h1>
-                <p class="text-[10px] text-gray-300">LANGUAGE EDUCATION</p>
+                <h1 class="text-2xl font-bold tracking-tighter uppercase leading-none">PARADISE<span class="text-[#c28d75]">TÜRK</span></h1>
+                <p class="text-[10px] text-gray-300 tracking-[0.2em]">LANGUAGE EDUCATION</p>
             </div>
-            <div class="bg-white/10 p-2 rounded-full flex items-center gap-2 px-3">
+            <div class="bg-white/10 p-2 rounded-full flex items-center gap-2 px-3 border border-white/20">
                 <span class="text-sm font-bold" id="score-display">0</span>
-                <span>👑</span>
+                <span class="text-lg">👑</span>
             </div>
         </header>
 
         <main id="main-content" class="flex-grow"></main>
 
-        <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-[#3a223c] border-t border-white/10 p-3 flex justify-around">
-            <button onclick="showCategories()" class="flex flex-col items-center">🏠<span class="text-[10px]">الرئيسية</span></button>
-            <button onclick="showProfile()" class="flex flex-col items-center opacity-50">👤<span class="text-[10px]">بروفايلي</span></button>
+        <nav id="footer-nav" class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-[#3a223c] border-t border-white/10 p-3 flex justify-around items-center">
+            <button onclick="showCategories()" id="nav-home" class="flex flex-col items-center gap-1 opacity-100 text-[#c28d75]">
+                <span class="text-xl">🏠</span>
+                <span class="text-[10px]">الرئيسية</span>
+            </button>
+            <button onclick="showProfile()" id="nav-profile" class="flex flex-col items-center gap-1 opacity-50">
+                <span class="text-xl">👤</span>
+                <span class="text-[10px]">بروفايلي</span>
+            </button>
         </nav>
     </div>
 
+    <div id="msg-box" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-6 rounded-2xl hidden z-50 text-center card-shadow min-w-[200px]">
+        <div id="msg-icon" class="text-5xl mb-3"></div>
+        <div id="msg-text" class="text-xl font-bold"></div>
+    </div>
+
     <script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyt8Bx9uNuL0aplfRfUma4a2-FFzZOX9a7J3kDBZdsSSK1vF3S51FRS9bCXFmTJkwM5/exec";
+        
         const data = [
-            { id: "numbers", title: "الأرقام", icon: "🔢", words: [
-                { tr: "Bir", ar: "واحد", en: "number 1", img: "1️⃣" }, { tr: "İki", ar: "اثنان", en: "number 2", img: "2️⃣" },
-                { tr: "Üç", ar: "ثلاثة", en: "number 3", img: "3️⃣" }, { tr: "Dört", ar: "أربعة", en: "number 4", img: "4️⃣" },
-                { tr: "Beş", ar: "خمسة", en: "number 5", img: "5️⃣" }, { tr: "Altı", ar: "ستة", en: "number 6", img: "6️⃣" },
-                { tr: "Yedi", ar: "سبعة", en: "number 7", img: "7️⃣" }, { tr: "Sekiz", ar: "ثمانية", en: "number 8", img: "8️⃣" },
-                { tr: "Dokuz", ar: "تسعة", en: "number 9", img: "9️⃣" }, { tr: "On", ar: "عشرة", en: "number 10", img: "🔟" }
-            ]},
-            { id: "colors", title: "الألوان", icon: "🎨", words: [
-                { tr: "Kırmızı", ar: "أحمر", en: "red color", img: "🔴" }, { tr: "Mavi", ar: "أزرق", en: "blue color", img: "🔵" },
-                { tr: "Yeşil", ar: "أخضر", en: "green color", img: "🟢" }, { tr: "Sarı", ar: "أصفر", en: "yellow color", img: "🟡" },
-                { tr: "Siyah", ar: "أسود", en: "black color", img: "⚫" }, { tr: "Beyaz", ar: "أبيض", en: "white color", img: "⚪" },
-                { tr: "Turuncu", ar: "برتقالي", en: "orange color", img: "🟠" }, { tr: "Mor", ar: "بنفسجي", en: "purple color", img: "🟣" },
-                { tr: "Pembe", ar: "وردي", en: "pink color", img: "🌸" }, { tr: "Kahverengi", ar: "بني", en: "brown color", img: "🟤" }
-            ]},
-            { id: "family", title: "العائلة", icon: "👨‍👩‍👧", words: [
-                { tr: "Anne", ar: "أم", en: "mother", img: "👩" }, { tr: "Baba", ar: "أب", en: "father", img: "👨" },
-                { tr: "Kardeş", ar: "أخ/أخت", en: "sibling", img: "👦" }, { tr: "Dede", ar: "جد", en: "grandfather", img: "👴" },
-                { tr: "Nene", ar: "جدة", en: "grandmother", img: "👵" }, { tr: "Oğul", ar: "ابن", en: "son", img: "👶" },
-                { tr: "Kız", ar: "بنت", en: "daughter", img: "👧" }, { tr: "Amca", ar: "عم", en: "uncle", img: "👱‍♂️" },
-                { tr: "Hala", ar: "عمة", en: "aunt", img: "👱‍♀️" }, { tr: "Bebek", ar: "طفل رضيع", en: "baby", img: "🍼" }
-            ]},
-            { id: "fruits", title: "الفواكه", icon: "🍎", words: [
-                { tr: "Elma", ar: "تفاح", en: "apple fruit", img: "🍎" }, { tr: "Muz", ar: "موز", en: "banana fruit", img: "🍌" },
-                { tr: "Çilek", ar: "فراولة", en: "strawberry", img: "🍓" }, { tr: "Üzüm", ar: "عنب", en: "grapes", img: "🍇" },
-                { tr: "Karpuz", ar: "بطيخ", en: "watermelon", img: "🍉" }, { tr: "Portakal", ar: "برتقال", en: "orange fruit", img: "🍊" },
-                { tr: "Limon", ar: "ليمون", en: "lemon", img: "🍋" }, { tr: "Kiraz", ar: "كرز", en: "cherry", img: "🍒" },
-                { tr: "Armut", ar: "كمثرى", en: "pear", img: "🍐" }, { tr: "Şeftali", ar: "خوخ", en: "peach", img: "🍑" }
-            ]},
-            { id: "jobs", title: "المهن", icon: "💼", words: [
-                { tr: "Doktor", ar: "طبيب", en: "doctor", img: "👨‍⚕️" }, { tr: "Öğretmen", ar: "معلم", en: "teacher", img: "👨‍🏫" },
-                { tr: "Mühendis", ar: "مهندس", en: "engineer", img: "👷" }, { tr: "Polis", ar: "شرطي", en: "police", img: "👮" },
-                { tr: "Aşçı", ar: "طباخ", en: "chef", img: "👨‍🍳" }, { tr: "Pilot", ar: "طيار", en: "pilot", img: "👨‍✈️" },
-                { tr: "Avukat", ar: "محامي", en: "lawyer", img: "⚖️" }, { tr: "Hemşire", ar: "ممرضة", en: "nurse", img: "👩‍⚕️" },
-                { tr: "Çiftçi", ar: "مزارع", en: "farmer", img: "👨‍🌾" }, { tr: "Sanatçı", ar: "فنان", en: "artist", img: "👨‍🎨" }
-            ]},
-            { id: "animals", title: "الحيوانات", icon: "🦁", words: [
-                { tr: "Kedi", ar: "قطة", en: "cat", img: "🐱" }, { tr: "Köpek", ar: "كلب", en: "dog", img: "🐶" },
-                { tr: "Aslan", ar: "أسد", en: "lion", img: "🦁" }, { tr: "Kuş", ar: "عصفور", en: "bird", img: "🐦" },
-                { tr: "At", ar: "حصان", en: "horse", img: "🐎" }, { tr: "Fil", ar: "فيل", en: "elephant", img: "🐘" },
-                { tr: "Maymun", ar: "قرد", en: "monkey", img: "🐒" }, { tr: "Tavşan", ar: "أرنب", en: "rabbit", img: "🐰" },
-                { tr: "Balık", ar: "سمكة", en: "fish", img: "🐟" }, { tr: "Ayı", ar: "دب", en: "bear", img: "🐻" }
-            ]},
-            { id: "nature", title: "الطبيعة", icon: "🌿", words: [
-                { tr: "Güneş", ar: "شمس", en: "sun", img: "☀️" }, { tr: "Ay", ar: "قمر", en: "moon", img: "🌙" },
-                { tr: "Yıldız", ar: "نجمة", en: "star", img: "⭐" }, { tr: "Deniz", ar: "بحر", en: "sea", img: "🌊" },
-                { tr: "Dağ", ar: "جبل", en: "mountain", img: "⛰️" }, { tr: "Ağaç", ar: "شجرة", en: "tree", img: "🌳" },
-                { tr: "Çiçek", ar: "زهرة", en: "flower", img: "🌻" }, { tr: "Yağmur", ar: "مطر", en: "rain", img: "🌧️" },
-                { tr: "Kar", ar: "ثلج", en: "snow", img: "❄️" }, { tr: "Bulut", ar: "سحاب", en: "cloud", img: "☁️" }
-            ]},
-            { id: "home", title: "المنزل", icon: "🏠", words: [
-                { tr: "Kapı", ar: "باب", en: "door", img: "🚪" }, { tr: "Pencere", ar: "نافذة", en: "window", img: "🪟" },
-                { tr: "Mutfak", ar: "مطبخ", en: "kitchen", img: "🍳" }, { tr: "Yatak", ar: "سرير", en: "bed", img: "🛏️" },
-                { tr: "Masa", ar: "طاولة", en: "table", img: "🪑" }, { tr: "Lamba", ar: "مصباح", en: "lamp", img: "💡" },
-                { tr: "Ayna", ar: "مرآة", en: "mirror", img: "🪞" }, { tr: "Bahçe", ar: "حديقة", en: "garden", img: "🏡" },
-                { tr: "Halı", ar: "سجادة", en: "carpet", img: "🧶" }, { tr: "Koltuk", ar: "كنبة", en: "sofa", img: "🛋️" }
-            ]},
-            { id: "food", title: "الطعام", icon: "🍔", words: [
-                { tr: "Ekmek", ar: "خبز", en: "bread", img: "🍞" }, { tr: "Su", ar: "ماء", en: "water bottle", img: "💧" },
-                { tr: "Süt", ar: "حليب", en: "milk", img: "🥛" }, { tr: "Peynir", ar: "جبن", en: "cheese", img: "🧀" },
-                { tr: "Yumurta", ar: "بيض", en: "eggs", img: "🥚" }, { tr: "Tuz", ar: "ملح", en: "salt", img: "🧂" },
-                { tr: "Şeker", ar: "سكر", en: "sugar", img: "🍬" }, { tr: "Çay", ar: "شاي", en: "turkish tea", img: "☕" },
-                { tr: "Kahve", ar: "قهوة", en: "coffee", img: "☕" }, { tr: "Çorba", ar: "شوربة", en: "soup", img: "🥣" }
-            ]},
-            { id: "feelings", title: "المشاعر", icon: "😊", words: [
-                { tr: "Mutlu", ar: "سعيد", en: "happy face", img: "😊" }, { tr: "Üzgün", ar: "حزين", en: "sad face", img: "😢" },
-                { tr: "Kızgın", ar: "غاضب", en: "angry face", img: "😠" }, { tr: "Yorgun", ar: "متعب", en: "tired person", img: "😫" },
-                { tr: "Aç", ar: "جائع", en: "hungry", img: "😋" }, { tr: "Susuz", ar: "عطشان", en: "thirsty", img: "🥵" },
-                { tr: "Şaşkın", ar: "متفاجئ", en: "surprised face", img: "😲" }, { tr: "Korkmuş", ar: "خائف", img: "😨" },
-                { tr: "Hasta", ar: "مريض", en: "sick person", img: "🤒" }, { tr: "İyi", ar: "بخير", en: "thumbs up", img: "👍" }
-            ]}
+            { id: "numbers", title: "الأرقام", icon: "🔢", words: [{ tr: "Bir", ar: "واحد", img: "1️⃣" }, { tr: "iki", ar: "اثنان", img: "2️⃣" }, { tr: "üç", ar: "ثلاثة", img: "3️⃣" }, { tr: "Dört", ar: "أربعة", img: "4️⃣" }, { tr: "Beş", ar: "خمسة", img: "5️⃣" }, { tr: "Altı", ar: "ستة", img: "6️⃣" }, { tr: "Yedi", ar: "سبعة", img: "7️⃣" }, { tr: "Sekiz", ar: "ثمانية", img: "8️⃣" }, { tr: "Dokuz", ar: "تسعة", img: "9️⃣" }, { tr: "On", ar: "عشرة", img: "🔟" }]},
+            { id: "colors", title: "الألوان", icon: "🎨", words: [{ tr: "Kırmızı", ar: "أحمر", img: "🔴" }, { tr: "Mavi", ar: "أزرق", img: "🔵" }, { tr: "Yeşil", ar: "أخضر", img: "🟢" }, { tr: "Sarı", ar: "أصفر", img: "🟡" }, { tr: "Siyah", ar: "أسود", img: "⚫" }, { tr: "Beyaz", ar: "أبيض", img: "⚪" }, { tr: "Turuncu", ar: "برتقالي", img: "🟠" }, { tr: "Mor", ar: "بنفسجي", img: "🟣" }, { tr: "Pembe", ar: "وردي", img: "🌸" }, { tr: "Kahverengi", ar: "بني", img: "🟤" }]},
+            { id: "family", title: "العائلة", icon: "👨‍👩‍👧", words: [{ tr: "Anne", ar: "أم", img: "👩" }, { tr: "Baba", ar: "أب", img: "👨" }, { tr: "Kardeş", ar: "أخ/أخت", img: "👦" }, { tr: "Dede", ar: "جد", img: "👴" }, { tr: "Nene", ar: "جدة", img: "👵" }, { tr: "Oğul", ar: "ابن", img: "👶" }, { tr: "Kız", ar: "بنت", img: "👧" }, { tr: "Amca", ar: "عم", img: "👱‍♂️" }, { tr: "Hala", ar: "عمة", img: "👱‍♀️" }, { tr: "Teyze", ar: "خالة", img: "👩‍💼" }]},
+            { id: "fruits", title: "الفواكه", icon: "🍎", words: [{ tr: "Elma", ar: "تفاح", img: "🍎" }, { tr: "Muz", ar: "موز", img: "🍌" }, { tr: "Çilek", ar: "فراولة", img: "🍓" }, { tr: "üzüm", ar: "عنب", img: "🍇" }, { tr: "Karpuz", ar: "بطيخ", img: "🍉" }, { tr: "Portakal", ar: "برتقال", img: "🍊" }, { tr: "Limon", ar: "ليمون", img: "🍋" }, { tr: "Kiraz", ar: "كرز", img: "🍒" }, { tr: "Armut", ar: "كمثرى", img: "🍐" }, { tr: "Şeftali", ar: "خوخ", img: "🍑" }]},
+            { id: "jobs", title: "المهن", icon: "💼", words: [{ tr: "Doktor", ar: "طبيب", img: "👨‍⚕️" }, { tr: "öğretmen", ar: "معلم", img: "👨‍🏫" }, { tr: "Mühendis", ar: "مهندس", img: "👷" }, { tr: "Polis", ar: "شرطي", img: "👮" }, { tr: "Aşçı", ar: "طباخ", img: "👨‍🍳" }, { tr: "Pilot", ar: "طيار", img: "👨‍✈️" }, { tr: "Avukat", ar: "محامي", img: "⚖️" }, { tr: "Hemşire", ar: "ممرضة", img: "👩‍⚕️" }, { tr: "Çiftçi", ar: "مزارع", img: "👨‍🌾" }, { tr: "Sanatçı", ar: "فنان", img: "👨‍🎨" }]},
+            { id: "animals", title: "الحيوانات", icon: "🦁", words: [{ tr: "Kedi", ar: "قطة", img: "🐱" }, { tr: "Köpek", ar: "كلب", img: "🐶" }, { tr: "Aslan", ar: "أسد", img: "🦁" }, { tr: "Kuş", ar: "عصفور", img: "🐦" }, { tr: "At", ar: "حصان", img: "🐎" }, { tr: "Fil", ar: "فيل", img: "🐘" }, { tr: "Maymun", ar: "قرد", img: "🐒" }, { tr: "Tavşan", ar: "أرنب", img: "🐰" }, { tr: "Balık", ar: "سمكة", img: "🐟" }, { tr: "Ayı", ar: "دب", img: "🐻" }]},
+            { id: "clothes", title: "الملابس", icon: "👕", words: [{ tr: "Ceket", ar: "سترة", img: "🧥" }, { tr: "Pantolon", ar: "بنطال", img: "👖" }, { tr: "Gömlek", ar: "قميص", img: "👕" }, { tr: "Ayakkabı", ar: "حذاء", img: "👟" }, { tr: "Şapka", ar: "قبعة", img: "🧢" }, { tr: "Elbise", ar: "فستان", img: "👗" }, { tr: "Çوراب", ar: "جوارب", img: "🧦" }, { tr: "Eldiven", ar: "قفازات", img: "🧤" }, { tr: "Kemer", ar: "حزام", img: "🎗" }, { tr: "Gözlük", ar: "نظارات", img: "👓" }]},
+            { id: "nature", title: "الطبيعة", icon: "🌿", words: [{ tr: "Güneş", ar: "شمس", img: "☀️" }, { tr: "Ay", ar: "قمر", img: "🌙" }, { tr: "Yıldız", ar: "نجمة", img: "⭐" }, { tr: "Deniz", ar: "بحر", img: "🌊" }, { tr: "Dağ", ar: "جبل", img: "⛰️" }, { tr: "Ağaç", ar: "شجرة", img: "🌳" }, { tr: "Çiçek", ar: "زهرة", img: "🌻" }, { tr: "Yağmur", ar: "مطر", img: "🌧️" }, { tr: "Kar", ar: "ثلج", img: "❄️" }, { tr: "Rüzgar", ar: "ريح", img: "💨" }]},
+            { id: "home", title: "المنزل", icon: "🏠", words: [{ tr: "Kapı", ar: "باب", img: "🚪" }, { tr: "Pencere", ar: "نافذة", img: "🪟" }, { tr: "Mutfak", ar: "مطبخ", img: "🍳" }, { tr: "Yatak", ar: "سرير", img: "🛏️" }, { tr: "Masa", ar: "طاولة", img: "https://img.icons8.com/?size=100&id=lR5VyMcksVo2&format=png&color=000000" }, { tr: "Lamba", ar: "مصباح", img: "💡" }, { tr: "Banyo", ar: "حمام", img: "🚿" }, { tr: "Bahçe", ar: "حديقة", img: "🏡" }, { tr: "Ayna", ar: "مرآة", img: "🪞" }, { tr: "Halı", ar: "سجادة", img: "🧶" }]},
+            { id: "verbs", title: "الأفعال الشائعة", icon: "跑", words: [{ tr: "Gel", ar: "تعال", img: "🏃‍♂️" }, { tr: "Git", ar: "اذهب", img: "🚶‍♂️" }, { tr: "Oku", ar: "اقرأ", img: "📖" }, { tr: "Yaz", ar: "اكتب", img: "✍️" }, { tr: "iç", ar: "اشرب", img: "🥤" }, { tr: "Ye", ar: "كل", img: "🍔" }, { tr: "Bak", ar: "انظر", img: "👀" }, { tr: "Dinle", ar: "استمع", img: "👂" }, { tr: "Oyna", ar: "العب", img: "🎮" }, { tr: "Uyu", ar: "نم", img: "😴" }]},
+            { id: "school", title: "المدرسة", icon: "🎒", words: [{ tr: "Kalem", ar: "قلم", img: "✏️" }, { tr: "Kitap", ar: "كتاب", img: "📚" }, { tr: "Defter", ar: "دفتر", img: "📓" }, { tr: "Okul", ar: "مدرسة", img: "🏫" }, { tr: "Sınıف", ar: "صف", img: "📋" }, { tr: "Sıra", ar: "مقعد", img: "🪑" }, { tr: "Çanta", ar: "حقيبة", img: "🎒" }, { tr: "Silgi", ar: "ممحاة", img: "🧼" }, { tr: "öğrenci", ar: "طالب", img: "👨‍🎓" }, { tr: "Sınav", ar: "امتحان", img: "📝" }]},
+            { id: "body", title: "جسم الإنسان", icon: "👤", words: [{ tr: "Göz", ar: "عين", img: "👁️" }, { tr: "Kulak", ar: "أذن", img: "👂" }, { tr: "Burun", ar: "أنف", img: "👃" }, { tr: "Ağız", ar: "فم", img: "👄" }, { tr: "El", ar: "يد", img: "✋" }, { tr: "Ayak", ar: "قدم", img: "🦶" }, { tr: "Baş", ar: "رأس", img: "💆" }, { tr: "Saç", ar: "شعر", img: "💇" }, { tr: "Kalp", ar: "قلب", img: "❤️" }, { tr: "Parmak", ar: "اصبع", img: "☝️" }]},
+            { id: "kitchen", title: "المطبخ", icon: "🍴", words: [{ tr: "Tabak", ar: "صحن", img: "🍽️" }, { tr: "Bardak", ar: "كأس", img: "🥛" }, { tr: "Kaşık", ar: "ملعقة", img: "🥄" }, { tr: "Çatal", ar: "شوكة", img: "🍴" }, { tr: "Bıçak", ar: "سكين", img: "🔪" }, { tr: "Tencere", ar: "قدر", img: "🍲" }, { tr: "Ekmek", ar: "خبز", img: "🍞" }, { tr: "Tuz", ar: "ملح", img: "🧂" }, { tr: "Çay", ar: "شاي", img: "☕" }, { tr: "Şeker", ar: "سكر", img: "🍬" }]},
+            { id: "weather", title: "الطقس", icon: "☁️", words: [{ tr: "Sıcak", ar: "حار", img: "🔥" }, { tr: "Soğuk", ar: "بارد", img: "❄️" }, { tr: "Bulutlu", ar: "غائم", img: "☁️" }, { tr: "Güneşلي", ar: "مشمس", img: "☀️" }, { tr: "Karlı", ar: "مثلج", img: "☃️" }, { tr: "Yağmurlu", ar: "ممطر", img: "🌧️" }, { tr: "Fırtına", ar: "عاصفة", img: "⛈️" }, { tr: "Derece", ar: "درجة", img: "🌡️" }, { tr: "Hava", ar: "هواء/جو", img: "🌬️" }, { tr: "Gökkuşağı", ar: "قوس قزح", img: "🌈" }]},
+            { id: "transport", title: "المواصلات", icon: "🚀", words: [{ tr: "Bisiklet", ar: "دراجة", img: "🚲" }, { tr: "Otobüs", ar: "حافلة", img: "🚌" }, { tr: "Uçak", ar: "طائرة", img: "✈️" }, { tr: "Tren", ar: "قطار", img: "🚆" }, { tr: "Gemi", ar: "سفينة", img: "🚢" }, { tr: "Motosiklet", ar: "دراجة نارية", img: "🏍️" }, { tr: "Taksi", ar: "تكسي", img: "🚕" }, { tr: "Metro", ar: "مترو", img: "🚇" }, { tr: "Helikopter", ar: "مروحية", img: "🚁" }, { tr: "Tramvay", ar: "ترامواي", img: "🚋" }]},
+            { id: "places", title: "الأماكن", icon: "📍", words: [{ tr: "Müze", ar: "متحف", img: "🏛️" }, { tr: "Tiyatro", ar: "مسرح", img: "🎭" }, { tr: "Sinema", ar: "سينما", img: "🎬" }, { tr: "Restoran", ar: "مطعم", img: "🍴" }, { tr: "Banka", ar: "بنك", img: "🏦" }, { tr: "Eczane", ar: "صيدلية", img: "💊" }, { tr: "Kütüphane", ar: "مكتبة", img: "📚" }, { tr: "Postane", ar: "بريد", img: "📮" }, { tr: "Otel", ar: "فندق", img: "🏨" }, { tr: "Liman", ar: "ميناء", img: "⚓" }]},
+            { id: "time", title: "الوقت", icon: "⏰", words: [{ tr: "Saat", ar: "ساعة", img: "🕒" }, { tr: "Gün", ar: "يوم", img: "📅" }, { tr: "Hafta", ar: "أسبوع", img: "🗓️" }, { tr: "Ay", ar: "شهر", img: "🌑" }, { tr: "Yıl", ar: "سنة", img: "🎆" }, { tr: "Bugün", ar: "اليوم", img: "📆" }, { tr: "Dün", ar: "أمس", img: "📅" }, { tr: "Yarın", ar: "غداً", img: "📅" }, { tr: "Sabah", ar: "صباح", img: "🌅" }, { tr: "Akşam", ar: "مساء", img: "🌇" }]},
+            { id: "vegetables", title: "الخضروات", icon: "🥦", words: [{ tr: "Domates", ar: "طماطم", img: "🍅" }, { tr: "Salatalık", ar: "خيار", img: "🥒" }, { tr: "Patates", ar: "بطاطس", img: "🥔" }, { tr: "Soğan", ar: "بصل", img: "🧅" }, { tr: "Havuç", ar: "جزر", img: "🥕" }, { tr: "Patlıcan", ar: "باذنجان", img: "🍆" }, { tr: "Biber", ar: "فلفل", img: "🫑" }, { tr: "Mısır", ar: "ذرة", img: "🌽" }, { tr: "Sarımsak", ar: "ثوم", img: "🧄" }, { tr: "Marul", ar: "خس", img: "🥬" }]},
+            { id: "feelings", title: "المشاعر", icon: "😊", words: [{ tr: "Mutlu", ar: "سعيد", img: "😊" }, { tr: "üzgün", ar: "حزين", img: "😢" }, { tr: "Kızgın", ar: "غاضب", img: "😠" }, { tr: "Yorgun", ar: "متعب", img: "😫" }, { tr: "Aç", ar: "جائع", img: "😋" }, { tr: "Susuz", ar: "عطشان", img: "🥵" }, { tr: "Şaşkın", ar: "متفاجئ", img: "😲" }, { tr: "Korkmuş", ar: "خائف", img: "😨" }, { tr: "Hasta", ar: "مريض", img: "🤒" }, { tr: "iyi", ar: "بخير", img: "👍" }]},
+            { id: "hobbies", title: "الهوايات", icon: "🎸", words: [{ tr: "Yüzme", ar: "سباحة", img: "🏊" }, { tr: "Koşu", ar: "جري", img: "🏃" }, { tr: "Yürüyüş", ar: "مشي", img: "🚶" }, { tr: "Resim", ar: "رسم", img: "🎨" }, { tr: "Müzik", ar: "موسيقى", img: "🎵" }, { tr: "Dans", ar: "رقص", img: "💃" }, { tr: "Kitap okuma", ar: "قراءة", img: "📖" }, { tr: "Yemek yapma", ar: "طبخ", img: "👨‍🍳" }, { tr: "Fotoğraf", ar: "تصوير", img: "📸" }, { tr: "Futbol", ar: "كرة قدم", img: "⚽" }]},
+            { id: "tech", title: "التكنولوجيا", icon: "📱", words: [{ tr: "Telefon", ar: "هاتف", img: "📱" }, { tr: "Bilgisayar", ar: "حاسوب", img: "💻" }, { tr: "internet", ar: "إنترنت", img: "🌐" }, { tr: "Ekran", ar: "شاشة", img: "🖥️" }, { tr: "Kamera", ar: "كاميرا", img: "📷" }, { tr: "Kulaklık", ar: "سماعات", img: "🎧" }, { tr: "Şarj cihazı", ar: "شاحن", img: "🔌" }, { tr: "Klavye", ar: "لوحة مفاتيح", img: "⌨️" }, { tr: "Fare", ar: "فأرة", img: "🖱️" }, { tr: "Yazıcı", ar: "طابعة", img: "🖨️" }]},
+            { id: "bathroom", title: "الحمام", icon: "🚿", words: [{ tr: "Sabun", ar: "صابون", img: "🧼" }, { tr: "Havlu", ar: "منشفة", img: "🧖" }, { tr: "Fırça", ar: "فرشاة", img: "🪥" }, { tr: "Diş macunu", ar: "معجون أسنان", img: "🦷" }, { tr: "Şampuan", ar: "شامبو", img: "🧴" }, { tr: "Küvet", ar: "حوض استحمام", img: "🛁" }, { tr: "Tuvalet", ar: "مرحاض", img: "🚽" }, { tr: "Musluk", ar: "صنبور", img: "🚰" }, { tr: "Duş", ar: "دوش", img: "🚿" }, { tr: "Tarak", ar: "مشط", img: "🪮" }]},
+            { id: "office", title: "المكتب", icon: "🏢", words: [{ tr: "Ofis masası", ar: "طاولة مكتب", img: "🖥️" }, { tr: "Çekmece", ar: "درج", img: "🗂" }, { tr: "Kağıt", ar: "ورق", img: "📄" }, { tr: "Dosya", ar: "ملف", img: "📁" }, { tr: "Zımba", ar: "خرامة/دباسة", img: "📎" }, { tr: "Makas", ar: "مقص", img: "✂️" }, { tr: "Bant", ar: "لاصق", img: "🎞️" }, { tr: "Sözlük", ar: "قاموس", img: "📕" }, { tr: "Takvim", ar: "تقويم", img: "📅" }, { tr: "Saat", ar: "ساعة مكتب", img: "⏲" }]},
+            { id: "music", title: "الموسيقى", icon: "🎵", words: [{ tr: "Gitar", ar: "جيتار", img: "🎸" }, { tr: "Piyano", ar: "بيانو", img: "🎹" }, { tr: "Keman", ar: "كمان", img: "🎻" }, { tr: "Davul", ar: "طبل", img: "🥁" }, { tr: "Şarkı", ar: "أغنية", img: "🎤" }, { tr: "Nota", ar: "نوتة", img: "🎶" }, { tr: "Radyo", ar: "راديو", img: "📻" }, { tr: "Konser", ar: "حفل", img: "🎟️" }, { tr: "Ses", ar: "صوت", img: "🔊" }, { tr: "Koro", ar: "كورال", img: "👥" }]},
+            { id: "sports", title: "الرياضة", icon: "🏀", words: [{ tr: "Top", ar: "كرة", img: "⚽" }, { tr: "Basketbol", ar: "كرة سلة", img: "🏀" }, { tr: "Voleybol", ar: "كرة طائرة", img: "🏐" }, { tr: "Tenis", ar: "تنس", img: "🎾" }, { tr: "Yüzme", ar: "سباحة", img: "🏊" }, { tr: "Koşu", ar: "جري", img: "🏃" }, { tr: "Jimnastik", ar: "جمباز", img: "🤸" }, { tr: "Bisiklet", ar: "دراجة", img: "🚲" }, { tr: "Takım", ar: "فريق", img: "🏟️" }, { tr: "Maç", ar: "مباراة", img: "🏁" }]},
+            { id: "space", title: "الفضاء", icon: "🚀", words: [{ tr: "Dünya", ar: "الأرض", img: "🌍" }, { tr: "Gezegen", ar: "كوكب", img: "🪐" }, { tr: "Astronot", ar: "رائد فضاء", img: "👨‍🚀" }, { tr: "Roket", ar: "صاروخ", img: "🚀" }, { tr: "Galaksi", ar: "مجرة", img: "🌌" }, { tr: "Teleskop", ar: "تلسكوب", img: "🔭" }, { tr: "Kuyruklu yıldız", ar: "مذنب", img: "☄️" }, { tr: "Uydu", ar: "قمر صناعي", img: "🛰️" }, { tr: "Mars", ar: "المريخ", img: "🔴" }, { tr: "Karanlık", ar: "ظلام", img: "🌑" }]},
+            { id: "vacation", title: "العطلة", icon: "🏖️", words: [{ tr: "Tatil", ar: "عطلة", img: "🏖️" }, { tr: "Otel", ar: "فندق", img: "🏨" }, { tr: "Plaj", ar: "شاطئ", img: "🏖️" }, { tr: "Kum", ar: "رمل", img: "🏖️" }, { tr: "Güneş kremi", ar: "واقي شمس", img: "🧴" }, { tr: "Bavul", ar: "حقيبة سفر", img: "🧳" }, { tr: "Pasaport", ar: "جواز سفر", img: "🛂" }, { tr: "Bilet", ar: "تذكرة", img: "🎫" }, { tr: "Harita", ar: "خريطة", img: "🗺️" }, { tr: "Fotograf", ar: "صورة", img: "📷" }]},
+            { id: "emotions2", title: "مشاعر متقدمة", icon: "🤯", words: [{ tr: "Heyecanlı", ar: "متحمس", img: "🤩" }, { tr: "Endişeli", ar: "قلق", img: "😟" }, { tr: "Gururlu", ar: "فخور", img: "😌" }, { tr: "Utangaç", ar: "خجول", img: "☺️" }, { tr: "Sıkılmış", ar: "ملان", img: "😑" }, { tr: "Yalnız", ar: "وحيد", img: "🙍" }, { tr: "Emin", ar: "متأكد", img: "🧐" }, { tr: "Kararsız", ar: "متردد", img: "🤔" }, { tr: "Umutlu", ar: "متأمل", img: "✨" }, { tr: "Kıskanç", ar: "غيور", img: "😒" }]},
+            { id: "tools", title: "الأدوات", icon: "🔧", words: [{ tr: "Çekiç", ar: "مطرقة", img: "🔨" }, { tr: "Tornavida", ar: "مفك", img: "🪛" }, { tr: "Pense", ar: "زرادية", img: "✂️" }, { tr: "Testere", ar: "منشار", img: "🪚" }, { tr: "Anahtar", ar: "مفتاح ربط", img: "🔧" }, { tr: "Matkap", ar: "مثقاب", img: "🔌" }, { tr: "ölçü", ar: "مقياس", img: "📏" }, { tr: "Boya", ar: "طلاء", img: "🎨" }, { tr: "Fırça", ar: "فرشاة طلاء", img: "🖌️" }, { tr: "Çivi", ar: "مسمار", img: "📌" }]},
+            { id: "garden", title: "أدوات الحديقة", icon: "🎍", words: [{ tr: "Toprak", ar: "تراب", img: "🪴" }, { tr: "Tohum", ar: "بذرة", img: "🌱" }, { tr: "Çapa", ar: "معزقة", img: "🥄" }, { tr: "Kova", ar: "دلو", img: "🪣" }, { tr: "Kürek", ar: "مجرفة", img: "🥄" }, { tr: "Hortum", ar: "خرطوم", img: "🐍" }, { tr: "Çim", ar: "عشب", img: "🌿" }, { tr: "Böcek", ar: "حشرة", img: "🐞" }, { tr: "Arı", ar: "نحلة", img: "🐝" }, { tr: "Kelebek", ar: "فراشة", img: "🦋" }]},
+            { id: "shapes", title: "الأشكال", icon: "🔷", words: [{ tr: "Daire", ar: "دائرة", img: "⭕" }, { tr: "Kare", ar: "مربع", img: "⬛" }, { tr: "üçgen", ar: "مثلت", img: "🔺" }, { tr: "Dikdörtgen", ar: "مستطيل", img: "▮" }, { tr: "Yıldız", ar: "نجمة", img: "⭐" }, { tr: "Kalp", ar: "قلب", img: "❤️" }, { tr: "Elips", ar: "بيضاوي", img: "🥚" }, { tr: "Altıgen", ar: "سداسي", img: "💠" }, { tr: "Çizgi", ar: "خط", img: "➖" }, { tr: "Nokta", ar: "نقطة", img: "⏺️" }]},
+            { id: "adjectives", title: "الصفات العامة", icon: "🎭", words: [{ tr: "Büyük", ar: "كبير", img: "🐘" }, { tr: "Küçük", ar: "صغير", img: "🐭" }, { tr: "Uzun", ar: "طويل", img: "🦒" }, { tr: "Kısa", ar: "قصير", img: "🚶" }, { tr: "Yeni", ar: "جديد", img: "🆕" }, { tr: "Eski", ar: "قديم", img: "🏺" }, { tr: "Güzel", ar: "جميل", img: "✨" }, { tr: "Çirkin", ar: "قبيح", img: "👺" }, { tr: "Zengin", ar: "غني", img: "💰" }, { tr: "Fakir", ar: "فقير", img: "🏚️" }]},
+            { id: "city_life", title: "الحياة في المدينة", icon: "🏙️", words: [{ tr: "Cadde", ar: "شارع رئيسي", img: "🛣️" }, { tr: "Sokak", ar: "زقاق/شارع", img: "🏘️" }, { tr: "Bina", ar: "بناء", img: "🏢" }, { tr: "Park", ar: "منتزه", img: "🌳" }, { tr: "Merkez", ar: "مركز", img: "📍" }, { tr: "Meydan", ar: "ساحة", img: "⛲" }, { tr: "Köprü", ar: "جسر", img: "🌉" }, { tr: "Durak", ar: "موقف", img: "🚏" }, { tr: "Cami", ar: "جامع", img: "🕌" }, { tr: "Kilise", ar: "كنيسة", img: "⛪" }]},
+            { id: "daily_routine", title: "الروتين اليومي", icon: "☀️", words: [{ tr: "Uyanmak", ar: "الاستيقاظ", img: "⏰" }, { tr: "Yıkamak", ar: "الغسل", img: "🧼" }, { tr: "Kahvaltı etmek", ar: "الفطور", img: "🍳" }, { tr: "Çalışmak", ar: "العمل", img: "💼" }, { tr: "Okumak", ar: "القراءة", img: "📖" }, { tr: "Dinlenmek", ar: "الاستراحة", img: "🛋️" }, { tr: "Temizlik", ar: "التنظيف", img: "🧹" }, { tr: "Alışveriş", ar: "التسوق", img: "🛒" }, { tr: "Yemek", ar: "الأكل", img: "🍽️" }, { tr: "Uyumak", ar: "النوم", img: "💤" }]},
+            { id: "health_care", title: "العناية بالصحة", icon: "🏥", words: [{ tr: "ilaç", ar: "دواء", img: "💊" }, { tr: "Hastane", ar: "مستشفى", img: "🏥" }, { tr: "Ağrı", ar: "ألم", img: "💥" }, { tr: "Ateş", ar: "حرارة", img: "🔥" }, { tr: "öksürük", ar: "سعال", img: "😷" }, { tr: "Reçete", ar: "وصفة", img: "📄" }, { tr: "Ambulans", ar: "إسعاف", img: "🚑" }, { tr: "Muayene", ar: "فحص", img: "🩺" }, { tr: "Yara", ar: "جرح", img: "🩹" }, { tr: "Doktor", ar: "طبيب", img: "👨‍⚕️" }]},
+            { id: "shopping_time", title: "التسوق والأسعار", icon: "🛒", words: [{ tr: "Fiyat", ar: "سعر", img: "🏷️" }, { tr: "indirim", ar: "خصم", img: "📉" }, { tr: "Pahalı", ar: "غالي", img: "💎" }, { tr: "Ucuz", ar: "رخيص", img: "🪙" }, { tr: "Kasa", ar: "صندوق الدفع", img: "💸" }, { tr: "Fiş", ar: "فاتورة", img: "🧾" }, { tr: "Poşet", ar: "كيس", img: "🛍️" }, { tr: "Müşteri", ar: "زبون", img: "👤" }, { tr: "Satıcı", ar: "بائع", img: "👨‍💼" }, { tr: "Market", ar: "متجر", img: "🏪" }]},
+            { id: "sea_side", title: "جانب البحر", icon: "🌊", words: [{ tr: "Dalga", ar: "موجة", img: "🌊" }, { tr: "Sahil", ar: "ساحل", img: "⛱️" }, { tr: "Ada", ar: "جزيرة", img: "🏝️" }, { tr: "Kabuk", ar: "صدفة", img: "🐚" }, { tr: "Yüzmek", ar: "سباحة", img: "🏊" }, { tr: "Dalış", ar: "غوص", img: "🤿" }, { tr: "Gemi", ar: "سفينة", img: "🚢" }, { tr: "Kum", ar: "رمل", img: "🏖️" }, { tr: "Tekne", ar: "قارب", img: "🚤" }, { tr: "Liman", ar: "ميناء", img: "⚓" }]},
+            { id: "furniture_home", title: "أثاث المنزل", icon: "🛋️", words: [{ tr: "Koltuk", ar: "كنبة", img: "🛋️" }, { tr: "Sandalye", ar: "كرسي", img: "🪑" }, { tr: "Dolap", ar: "خزانة", img: "🗄️" }, { tr: "Raf", ar: "رف", img: "🪜" }, { tr: "Perde", ar: "ستارة", img: "🖼️" }, { tr: "Sehpa", ar: "طاولة صغيرة", img: "☕" }, { tr: "Yastık", ar: "وسادة", img: "🛌" }, { tr: "Çekmece", ar: "درج", img: "📂" }, { tr: "Halı", ar: "سجادة", img: "🧶" }, { tr: "Ayna", ar: "مرآة", img: "🪞" }]},
+            { id: "kitchen_tools", title: "أدوات المطبخ 2", icon: "🍳", words: [{ tr: "Fırın", ar: "فرن", img: "🔥" }, { tr: "Buzdolabı", ar: "ثلاجة", img: "❄️" }, { tr: "Tava", ar: "مقلاة", img: "🍳" }, { tr: "Süzgeç", ar: "مصفاة", img: "🕸️" }, { tr: "Kase", ar: "زبدية", img: "🥣" }, { tr: "Tepsi", ar: "صينية", img: "🍱" }, { tr: "önlük", ar: "مريلة", img: "🎽" }, { tr: "Rende", ar: "مبشرة", img: "🧀" }, { tr: "Kavanoz", ar: "مرطبان", img: "🫙" }, { tr: "Sürahi", ar: "إبريق", img: "🍶" }]},
+            { id: "opposites_word", title: "الأضداد", icon: "↔️", words: [{ tr: "Açık", ar: "مفتوح", img: "🔓" }, { tr: "Kapalı", ar: "مغلق", img: "🔒" }, { tr: "Dolu", ar: "ممتلئ", img: "🥛" }, { tr: "Boş", ar: "فارغ", img: "🫙" }, { tr: "Ağır", ar: "ثقيل", img: "🏋️" }, { tr: "Hafif", ar: "خفيف", img: "🍃" }, { tr: "Hızlı", ar: "سريع", img: "🏃" }, { tr: "Yavaş", ar: "بطيء", img: "🐢" }, { tr: "Sert", ar: "قاسي", img: "💎" }, { tr: "Yumuşak", ar: "ناعم", img: "☁️" }]},
+            { id: "materials_base", title: "المواد الخام", icon: "🏗️", words: [{ tr: "Demir", ar: "حديد", img: "⛓️" }, { tr: "Tahta", ar: "خشب", img: "🪵" }, { tr: "Cam", ar: "زجاج", img: "🍷" }, { tr: "Plastik", ar: "بلاستيك", img: "🥤" }, { tr: "Pamuk", ar: "قطن", img: "☁️" }, { tr: "Kağıt", ar: "ورق", img: "📄" }, { tr: "Taş", ar: "حجر", img: "🪨" }, { tr: "Altın", ar: "ذهب", img: "🥇" }, { tr: "Gümüş", ar: "فضة", img: "🥈" }, { tr: "Deri", ar: "جلد", img: "👞" }]},
+            { id: "airport_travel", title: "في المطار", icon: "✈️", words: [{ tr: "Pasaport", ar: "جواز سفر", img: "🛂" }, { tr: "Bilet", ar: "تذكرة", img: "🎫" }, { tr: "Kapı", ar: "بوابة", img: "🚪" }, { tr: "Pilot", ar: "طيار", img: "👨‍✈️" }, { tr: "Hostes", ar: "مضيفة", img: "👩‍✈️" }, { tr: "Bagaj", ar: "حقيبة سفر", img: "🧳" }, { tr: "iniş", ar: "هبوط", img: "🛬" }, { tr: "Kalkış", ar: "إقلاع", img: "🛫" }, { tr: "Koltuk", ar: "مقعد", img: "💺" }, { tr: "Uçak", ar: "طائرة", img: "✈️" }]},
+            { id: "restaurant_order", title: "في المطعم", icon: "🍽️", words: [{ tr: "Menü", ar: "قائمة", img: "📜" }, { tr: "Sipariş", ar: "طلب", img: "📝" }, { tr: "Hesap", ar: "حساب", img: "🧾" }, { tr: "Garson", ar: "نادل", img: "🤵" }, { tr: "Masa", ar: "طاولة", img: "🍽️" }, { tr: "Su", ar: "ماء", img: "💧" }, { tr: "Tuz", ar: "ملح", img: "🧂" }, { tr: "Peçete", ar: "منديل", img: "🧻" }, { tr: "Tatlı", ar: "حلوى", img: "🍰" }, { tr: "Bahşiş", ar: "إكرامية", img: "💵" }]},
+            { id: "nature_second", title: "الطبيعة 2", icon: "🌋", words: [{ tr: "Orman", ar: "غابة", img: "🌲" }, { tr: "Şelale", ar: "شلال", img: "🌊" }, { tr: "Göl", ar: "بحيرة", img: "🏞️" }, { tr: "Mağara", ar: "كهف", img: "🕳️" }, { tr: "Çöl", ar: "صحراء", img: "🏜️" }, { tr: "Vadi", ar: "وادي", img: "⛰️" }, { tr: "Yanardağ", ar: "بركان", img: "🌋" }, { tr: "Deprem", ar: "زلزال", img: "🏚️" }, { tr: "Sel", ar: "فيضان", img: "🌊" }, { tr: "Ada", ar: "جزيرة", img: "🏝️" }]},
+            { id: "world_countries", title: "الدول والعالم", icon: "🌍", words: [{ tr: "Türkiye", ar: "تركيا", img: "🇹🇷" }, { tr: "Mısır", ar: "مصر", img: "🇪🇬" }, { tr: "Suudi Arabistan", ar: "السعودية", img: "🇸🇦" }, { tr: "Suriye", ar: "سوريا", img: "🇸🇾" }, { tr: "ürdün", ar: "الأردن", img: "🇯🇴" }, { tr: "Irak", ar: "العراق", img: "🇮🇶" }, { tr: "Filistin", ar: "فلسطين", img: "🇵🇸" }, { tr: "Almanya", ar: "ألمانيا", img: "🇩🇪" }, { tr: "Fransa", ar: "فرنسا", img: "🇫🇷" }, { tr: "Kuveyt", ar: "الكويت", img: "🇰🇼" }]},
+            { id: "wild_animals_zoo", title: "حيوانات برية", icon: "🐅", words: [{ tr: "Kurt", ar: "ذئب", img: "🐺" }, { tr: "Ayı", ar: "دب", img: "🐻" }, { tr: "Kaplan", ar: "نمر", img: "🐅" }, { tr: "Zürafa", ar: "زرافة", img: "🦒" }, { tr: "Yılan", ar: "ثعبان", img: "🐍" }, { tr: "Tilki", ar: "ثعلب", img: "🦊" }, { tr: "Geyik", ar: "غزال", img: "🦌" }, { tr: "Timsah", ar: "تمساح", img: "🐊" }, { tr: "Fil", ar: "فيل", img: "🐘" }, { tr: "Maymun", ar: "قرد", img: "🐒" }]},
+            { id: "body_parts_two", title: "جسم الإنسان 2", icon: "🦷", words: [{ tr: "Diz", ar: "ركبة", img: "🦵" }, { tr: "Dirsek", ar: "مرفق", img: "💪" }, { tr: "Omuz", ar: "كتف", img: "👔" }, { tr: "Boyun", ar: "رقبة", img: "🧣" }, { tr: "Sırt", ar: "ظهر", img: "🧘" }, { tr: "Bel", ar: "خصر", img: "🧍" }, { tr: "Diş", ar: "سن", img: "🦷" }, { tr: "Dil", ar: "لسان", img: "👅" }, { tr: "Kaş", ar: "حاجب", img: "🤨" }, { tr: "Kirpik", ar: "رمش", img: "👁️" }]},
+            { id: "abstract_concepts", title: "مفاهيم عقلية", icon: "💭", words: [{ tr: "Fikir", ar: "فكرة", img: "💡" }, { tr: "Hayal", ar: "خيال", img: "💭" }, { tr: "Bilgi", ar: "معلومة", img: "ℹ️" }, { tr: "Gerçek", ar: "حقيقة", img: "✔️" }, { tr: "Yalan", ar: "كذب", img: "❌" }, { tr: "Sevgi", ar: "حب", img: "💖" }, { tr: "Saygı", ar: "احترام", img: "🤝" }, { tr: "Güven", ar: "ثقة", img: "🛡️" }, { tr: "Başarı", ar: "نجاح", img: "🏆" }, { tr: "Huzur", ar: "هدوء/سلام", img: "🕊️" }]},
+            { id: "emergency_help", title: "الطوارئ", icon: "🚨", words: [{ tr: "imdat", ar: "النجدة", img: "🆘" }, { tr: "Yardım", ar: "مساعدة", img: "🤝" }, { tr: "Tehlike", ar: "خطر", img: "⚠️" }, { tr: "Yangın", ar: "حريق", img: "🔥" }, { tr: "Kaza", ar: "حادث", img: "🚗" }, { tr: "itfaiye", ar: "إطفاء", img: "🚒" }, { tr: "Kayıp", ar: "ضائع", img: "🔍" }, { tr: "Dikkat", ar: "انتباه", img: "❗" }, { tr: "Dur", ar: "قف", img: "🛑" }, { tr: "Polis", ar: "شرطة", img: "👮" }]},
+            { id: "directions_map", title: "الاتجاهات", icon: "🧭", words: [{ tr: "Sağ", ar: "يمين", img: "➡️" }, { tr: "Sol", ar: "يسار", img: "⬅️" }, { tr: "ön", ar: "أمام", img: "⬆️" }, { tr: "Arka", ar: "خلف", img: "⬇️" }, { tr: "üst", ar: "فوق", img: "⤴️" }, { tr: "Alt", ar: "تحت", img: "⤵️" }, { tr: "Kuzey", ar: "شمال", img: "🧭" }, { tr: "Güney", ar: "جنوب", img: "🧭" }, { tr: "Doğu", ar: "شرق", img: "🧭" }, { tr: "Batı", ar: "غرب", img: "🧭" }]}
         ];
 
         let currentScore = parseInt(localStorage.getItem('paradise_score') || '0');
         const mainContent = document.getElementById('main-content');
+        const scoreDisplay = document.getElementById('score-display');
+
+        async function verifyAccess() {
+            const emailInput = document.getElementById('user-email').value.trim().toLowerCase();
+            const btn = document.getElementById('login-btn');
+            const msg = document.getElementById('auth-msg');
+
+            if(!emailInput) return alert("لطفاً أدخل البريد الإلكتروني");
+
+            btn.innerText = "جاري التحقق...";
+            btn.disabled = true;
+
+            try {
+                const response = await fetch(`${SCRIPT_URL}?email=${encodeURIComponent(emailInput)}&t=${new Date().getTime()}`);
+                const result = await response.json();
+
+                if (result.status === "success") {
+                    localStorage.setItem('paradise_access_granted', 'true');
+                    document.getElementById('auth-overlay').classList.add('hidden');
+                    document.getElementById('app').classList.remove('hidden');
+                    showCategories();
+                } else {
+                    msg.innerText = "هذا البريد غير مسجل كطالب VIP.";
+                    msg.classList.remove('hidden');
+                }
+            } catch (error) {
+                msg.innerText = "خطأ في الاتصال. تأكدي من تفعيل الـ Web App.";
+                msg.classList.remove('hidden');
+            } finally {
+                btn.innerText = "فتح البوابة";
+                btn.disabled = false;
+            }
+        }
+
+        function updateScore(points) {
+            currentScore += points;
+            localStorage.setItem('paradise_score', currentScore);
+            scoreDisplay.innerText = currentScore;
+
+            if (currentScore > 0 && currentScore % 500 === 0) {
+                setTimeout(showFinalVictory, 1200);
+            }
+        }
+
+        function speak(text) {
+            if (!window.speechSynthesis) return;
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'tr-TR'; 
+            utterance.rate = 0.85;
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function showMessage(type, text) {
+            const box = document.getElementById('msg-box');
+            const icon = document.getElementById('msg-icon');
+            const txt = document.getElementById('msg-text');
+            box.classList.remove('hidden');
+            box.className = `fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-6 rounded-2xl z-50 text-center card-shadow min-w-[200px] ${type === 'success' ? 'bg-green-600' : 'bg-red-600'} text-white`;
+            icon.innerText = type === 'success' ? "👑" : "❌";
+            txt.innerText = text;
+            setTimeout(() => box.classList.add('hidden'), 1500);
+        }
 
         function showCategories() {
-            mainContent.innerHTML = `<div class="grid grid-cols-2 gap-4 mt-4">${data.map(cat => `
-                <div onclick="showWords('${cat.id}')" class="category-card p-6 rounded-3xl text-center bg-white/5 cursor-pointer shadow-lg">
-                    <div class="text-4xl mb-2">${cat.icon}</div>
-                    <h3 class="font-bold text-sm gold-gradient">${cat.title}</h3>
-                </div>`).join('')}</div>`;
-        }
-
-        function showWords(catId) {
-            const category = data.find(c => c.id === catId);
+            scoreDisplay.innerText = currentScore;
+            updateNav('home');
             mainContent.innerHTML = `
-                <div class="flex items-center gap-3 mb-6 mt-4">
-                    <button onclick="showCategories()" class="text-2xl">🔙</button>
-                    <h2 class="text-xl font-bold gold-gradient">${category.title}</h2>
+                <div class="mb-6 mt-4">
+                    <h2 class="text-xl font-bold mb-1">اختر موضوعاً</h2>
+                    <p class="text-gray-400 text-sm">ابدأ رحلة التعلم واحصد التيجان (50 موضوع)</p>
                 </div>
-                <div class="space-y-4">
-                    ${category.words.map(word => `
-                        <div onclick="handleWordClick('${word.tr}')" class="flex items-center p-3 bg-white/5 border border-white/10 rounded-2xl gap-4 active:scale-95 transition-all cursor-pointer">
-                            <div class="w-16 h-16 bg-white/10 rounded-xl overflow-hidden flex items-center justify-center relative">
-                                <span class="absolute text-xl z-0">${word.img}</span>
-                                <img src="https://images.unsplash.com/photo-1500000000000?w=200&auto=format&fit=crop&sig=${word.en.replace(' ', '')}" 
-                                     alt="${word.tr}"
-                                     class="relative z-10 w-full h-full object-cover" 
-                                     onerror="this.style.display='none'">
-                            </div>
-                            <div class="flex-grow text-right">
-                                <div class="text-lg font-bold">${word.tr}</div>
-                                <div class="text-sm text-gray-400">${word.ar}</div>
-                            </div>
-                            <div class="opacity-50">🔊</div>
-                        </div>`).join('')}
-                </div>`;
-            window.scrollTo(0,0);
+                <div class="grid grid-cols-2 gap-4 pb-12 custom-scrollbar overflow-y-auto max-h-[70vh]">
+                    ${data.map(cat => `
+                        <div onclick="startLesson('${cat.id}')" class="category-card rounded-2xl p-6 flex flex-col items-center justify-center text-center cursor-pointer bg-white/5">
+                            <span class="text-4xl mb-3">${cat.icon}</span>
+                            <span class="font-bold text-sm">${cat.title}</span>
+                            <span class="text-[10px] mt-2 text-gray-400">10 كلمات</span>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
         }
 
-        function handleWordClick(text) {
-            window.speechSynthesis.cancel();
-            const msg = new SpeechSynthesisUtterance(text);
-            msg.lang = 'tr-TR';
-            window.speechSynthesis.speak(msg);
-            currentScore++;
-            document.getElementById('score-display').innerText = currentScore;
-            localStorage.setItem('paradise_score', currentScore);
+        function startLesson(catId) {
+            const category = data.find(c => c.id === catId);
+            let wordIndex = 0;
+            const renderWord = () => {
+                const word = category.words[wordIndex];
+                mainContent.innerHTML = `
+                    <div class="flex items-center gap-2 mb-8">
+                        <button onclick="showCategories()" class="text-xl">←</button>
+                        <h2 class="text-lg font-bold">${category.title}</h2>
+                        <div class="flex-grow bg-white/10 h-1.5 rounded-full overflow-hidden">
+                            <div class="bg-gold-gradient h-full transition-all duration-500" style="width: ${((wordIndex+1)/10)*100}%"></div>
+                        </div>
+                        <span class="text-[10px] opacity-50">${wordIndex+1}/10</span>
+                    </div>
+                    <div class="flex flex-col items-center text-center">
+                        <div class="w-48 h-48 bg-white/5 rounded-3xl flex items-center justify-center text-7xl mb-8 card-shadow border border-white/10">
+                            ${word.img}
+                        </div>
+                        <h3 class="text-4xl font-bold tracking-wider mb-2 gold-gradient">${word.tr}</h3>
+                        <p class="text-xl text-gray-300 mb-8">${word.ar}</p>
+                        <button onclick="speak('${word.tr}')" class="bg-white/10 w-16 h-16 rounded-full flex items-center justify-center mb-12 hover:bg-white/20">
+                            <span class="text-2xl">🔊</span>
+                        </button>
+                        <div class="grid grid-cols-1 gap-4 w-full">
+                            <button onclick="checkAnswer('${word.tr}')" class="bg-gold-gradient text-[#4a2b4d] font-bold py-4 rounded-xl btn-bounce shadow-lg">تخطي / التالي</button>
+                        </div>
+                    </div>
+                `;
+            };
+            window.checkAnswer = (correct) => {
+                updateScore(1);
+                showMessage('success', 'رائع! +1 تاج');
+                speak(correct);
+                setTimeout(() => {
+                    wordIndex++;
+                    if(wordIndex < 10) renderWord();
+                    else showCompletion(category.title);
+                }, 1000);
+            };
+            renderWord();
         }
 
-        function verifyAccess() {
-            localStorage.setItem('paradise_access_granted', 'true');
-            document.getElementById('auth-overlay').classList.add('hidden');
-            document.getElementById('app').classList.remove('hidden');
-            showCategories();
+        function showCompletion(title) {
+            mainContent.innerHTML = `
+                <div class="flex flex-col items-center justify-center text-center py-12">
+                    <div class="crown-icon text-9xl mb-6">👑</div>
+                    <h2 class="text-3xl font-bold mb-4 gold-gradient">أحسنت يا بطل!</h2>
+                    <p class="text-gray-300 mb-8 px-6">لقد أتممت موضوع (${title}) بنجاح.</p>
+                    <button onclick="showCategories()" class="bg-gold-gradient text-[#4a2b4d] font-bold px-12 py-4 rounded-xl shadow-lg">العودة للرئيسية</button>
+                </div>
+            `;
+        }
+
+        function showFinalVictory() {
+            mainContent.innerHTML = `
+                <div class="flex flex-col items-center justify-center text-center py-12 px-6">
+                    <div class="crown-icon text-9xl mb-6">🏆</div>
+                    <h2 class="text-3xl font-bold mb-4 gold-gradient">إنجاز القاموس الذهبي!</h2>
+                    <p class="text-gray-300 mb-8 leading-relaxed">
+                        لقد لمست الآن جميع الكلمات الـ 500! <br>
+                        تيجانك الآن هي <span class="text-white font-bold">${currentScore}</span>. <br>
+                        استمر في حصد التيجان لتثبيت الكلمات في ذاكرتك للأبد والوصول لرتبة "السلطان اللغوي".
+                    </p>
+                    <button onclick="showCategories()" class="bg-gold-gradient text-[#4a2b4d] font-bold px-12 py-4 rounded-xl shadow-lg btn-bounce">
+                        متابعة الرحلة نحو القمة
+                    </button>
+                </div>
+            `;
         }
 
         function showProfile() {
-            mainContent.innerHTML = `<div class="text-center py-10"><div class="text-6xl mb-4">👑</div>
-                <h2 class="text-2xl font-bold gold-gradient mb-8 uppercase">PARADISE VIP</h2>
-                <div class="bg-white/5 p-8 rounded-3xl border border-white/10">
-                    <p class="text-sm text-gray-400 mb-1">رصيدك من التيجان</p>
-                    <div class="text-5xl font-bold gold-gradient">${currentScore}</div>
-                </div></div>`;
+            updateNav('profile');
+            mainContent.innerHTML = `
+                <div class="py-8">
+                    <div class="flex flex-col items-center mb-10">
+                        <div class="w-24 h-24 rounded-full bg-gold-gradient flex items-center justify-center text-4xl mb-4 text-[#4a2b4d] font-bold">P</div>
+                        <h2 class="text-xl font-bold gold-gradient uppercase">Paradis</h2>
+                        <p class="text-sm text-gray-400 tracking-widest uppercase">Paradise Türk Student</p>
+                    </div>
+                    <div class="bg-white/5 rounded-2xl p-6 mb-4 flex justify-between items-center border border-white/10">
+                        <div>
+                            <p class="text-xs text-gray-400">إجمالي التيجان</p>
+                            <p class="text-2xl font-bold gold-gradient">${currentScore} 👑</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-xs text-gray-400">المستوى</p>
+                            <p class="font-bold">${currentScore > 400 ? 'أستاذ' : currentScore > 200 ? 'متقدم' : 'مبتدئ'}</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-white/5 p-4 rounded-xl text-center border border-white/5">
+                            <span class="block text-2xl mb-1">🎯</span>
+                            <span class="text-[10px] text-gray-400 uppercase">المواضيع</span>
+                            <span class="block font-bold">${Math.floor(currentScore/10)} / 50</span>
+                        </div>
+                        <div class="bg-white/5 p-4 rounded-xl text-center border border-white/5">
+                            <span class="block text-2xl mb-1">🏅</span>
+                            <span class="text-[10px] text-gray-400 uppercase">الكلمات</span>
+                            <span class="block font-bold">${currentScore} / 500</span>
+                        </div>
+                    </div>
+                    <button onclick="logout()" class="w-full mt-8 text-red-400 text-sm opacity-50">تسجيل الخروج</button>
+                </div>
+            `;
+        }
+
+        function updateNav(page) {
+            const home = document.getElementById('nav-home');
+            const profile = document.getElementById('nav-profile');
+            if(page === 'home') {
+                home.className = "flex flex-col items-center gap-1 text-[#c28d75]";
+                profile.className = "flex flex-col items-center gap-1 opacity-50";
+            } else {
+                profile.className = "flex flex-col items-center gap-1 text-[#c28d75]";
+                home.className = "flex flex-col items-center gap-1 opacity-50";
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('paradise_access_granted');
+            location.reload();
         }
 
         window.onload = () => {
             setTimeout(() => {
-                document.getElementById('loading-overlay').classList.add('hidden');
-                if(localStorage.getItem('paradise_access_granted')) {
+                document.getElementById('loading-overlay').style.display = 'none';
+                if (localStorage.getItem('paradise_access_granted') === 'true') {
                     document.getElementById('app').classList.remove('hidden');
                     showCategories();
                 } else {
                     document.getElementById('auth-overlay').classList.remove('hidden');
                 }
-            }, 1000);
+            }, 1500);
         };
     </script>
 </body>
