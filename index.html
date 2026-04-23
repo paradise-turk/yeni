@@ -195,14 +195,17 @@
             { id: "directions_map", title: "الاتجاهات", icon: "🧭", words: [{ tr: "Sağ", ar: "يمين", img: "➡️" }, { tr: "Sol", ar: "يسار", img: "⬅️" }, { tr: "ön", ar: "أمام", img: "⬆️" }, { tr: "Arka", ar: "خلف", img: "⬇️" }, { tr: "üst", ar: "فوق", img: "⤴️" }, { tr: "Alt", ar: "تحت", img: "⤵️" }, { tr: "Kuzey", ar: "شمال", img: "🧭" }, { tr: "Güney", ar: "جنوب", img: "🧭" }, { tr: "Doğu", ar: "شرق", img: "🧭" }, { tr: "Batı", ar: "غرب", img: "🧭" }]}
         ];
         
-       data.forEach(category => {
+      data.forEach(category => {
+    if (category.img && category.img.startsWith('http')) {
+        category.img = `<img src="${category.img}" style="width:1.4em; height:1.4em; vertical-align:middle; object-fit:contain;">`;
+    }
+
     category.words.forEach(word => {
-        if (word.img.startsWith('http')) {
+        if (word.img && word.img.startsWith('http')) {
             word.img = `<img src="${word.img}" style="width:1.4em; height:1.4em; vertical-align:middle; object-fit:contain;">`;
         }
     });
 });
- 
         let currentScore = parseInt(localStorage.getItem('paradise_score') || '0');
         const mainContent = document.getElementById('main-content');
         const scoreDisplay = document.getElementById('score-display');
