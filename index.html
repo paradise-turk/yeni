@@ -1,163 +1,100 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="tr" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Paradise Türk - تعلم اللغة التركية</title>
+    <title>Paradise Türk</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root { --primary-purple: #4a2b4d; --accent-gold: #c28d75; --soft-gold: #e5c3b3; --white: #ffffff; }
-        body { font-family: 'Tajawal', sans-serif; background-color: var(--primary-purple); color: var(--white); margin: 0; overflow-x: hidden; }
-        .gold-gradient { background: linear-gradient(135deg, var(--accent-gold), var(--soft-gold)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .bg-gold-gradient { background: linear-gradient(135deg, var(--accent-gold), var(--soft-gold)); }
-        .category-card { transition: all 0.3s ease; border: 1px solid rgba(194, 141, 117, 0.3); background: rgba(255,255,255,0.05); cursor: pointer; }
-        .category-card:hover { transform: translateY(-5px); border-color: var(--accent-gold); }
-        .word-image { width: 100%; max-width: 250px; height: 200px; object-fit: cover; margin: 0 auto 20px; border-radius: 20px; border: 3px solid var(--accent-gold); background: #f0f0f0; }
-        .tr-text { direction: ltr !important; unicode-bidi: isolate; display: block; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        :root { --primary: #4a2b4d; --gold: #c28d75; }
+        body { font-family: 'Tajawal', sans-serif; background-color: var(--primary); color: white; margin: 0; }
+        .gold-text { color: var(--gold); }
+        .card { background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(194, 141, 117, 0.3); border-radius: 30px; }
+        .word-image { width: 100%; height: 220px; object-fit: cover; border-radius: 20px; margin-bottom: 15px; border: 2px solid var(--gold); }
+        /* تصحيح عرض النص التركي */
+        .turkish-text { direction: ltr !important; text-transform: none !important; font-family: Arial, sans-serif; font-weight: bold; }
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-    <div id="loading-overlay" class="fixed inset-0 bg-[#4a2b4d] z-[300] flex flex-col justify-center items-center">
-        <div class="text-6xl animate-bounce">👑</div>
-        <h2 class="text-2xl font-bold gold-gradient uppercase">Paradise Türk</h2>
-    </div>
-
-    <div id="app" class="max-w-md mx-auto min-h-screen flex flex-col p-4 pb-24">
-        <header class="flex justify-between items-center py-6">
-            <div class="flex flex-col">
-                <h1 class="text-2xl font-bold tracking-tighter uppercase">PARADISE<span class="text-[#c28d75]">TÜRK</span></h1>
-                <p class="text-[10px] text-gray-300 tracking-[0.2em]">LANGUAGE EDUCATION</p>
-            </div>
-            <div class="bg-white/10 p-2 rounded-full flex items-center gap-2 px-3 border border-white/20">
-                <span class="text-sm font-bold" id="score-display">0</span>
-                <span class="text-lg">👑</span>
+    <div id="app" class="max-w-md mx-auto min-h-screen p-5">
+        <header class="flex justify-between items-center py-5">
+            <div class="text-xl font-bold uppercase">PARADISE <span class="gold-text">TÜRK</span></div>
+            <div class="bg-white/10 px-4 py-1 rounded-full border border-white/20">
+                <span id="score">0</span> 👑
             </div>
         </header>
 
-        <div id="main-content"></div>
-
-        <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-[#3a223c] border-t border-white/10 p-3 flex justify-around items-center z-50">
-            <button onclick="showCategories()" class="flex flex-col items-center gap-1"><span class="text-xl">🏠</span><span class="text-[10px]">الرئيسية</span></button>
-            <button onclick="alert('قريباً')" class="flex flex-col items-center gap-1 opacity-50"><span class="text-xl">👤</span><span class="text-[10px]">بروفايلي</span></button>
-        </nav>
+        <div id="content"></div>
     </div>
 
     <script>
-        // الـ 100 كلمة الأولى (سنكتب الاسم بالإنجليزية للبحث عن الصورة الواقعية بدقة)
         const data = [
-            { id: "numbers", title: "الأرقام", icon: "🔢", words: [
-                { tr: "Bir", ar: "واحد", search: "one number" },
-                { tr: "İki", ar: "اثنان", search: "two number" },
-                { tr: "Üç", ar: "ثلاثة", search: "three number" }
-            ]},
-            { id: "jobs", title: "المهن", icon: "💼", words: [
-                { tr: "Doktor", ar: "طبيب", search: "doctor with stethoscope real" },
-                { tr: "Öğretmen", ar: "معلم", search: "teacher classroom real" },
-                { tr: "Mühendis", ar: "مهندس", search: "engineer with helmet real" },
-                { tr: "Çiftçi", ar: "مزارع", search: "farmer field real" },
-                { tr: "Aşçı", ar: "طباخ", search: "chef cooking kitchen real" }
-            ]},
-            { id: "fruits", title: "الفواكه", icon: "🍎", words: [
-                { tr: "Elma", ar: "تفاح", search: "red apple real" },
-                { tr: "Muz", ar: "موز", search: "banana real" },
-                { tr: "Çilek", ar: "فراولة", search: "strawberry real" }
-            ]},
-            { id: "animals", title: "الحيوانات", icon: "🦁", words: [
-                { tr: "Kedi", ar: "قطة", search: "cat animal real" },
-                { tr: "Köpek", ar: "كلب", search: "dog animal real" },
-                { tr: "Aslan", ar: "أسد", search: "lion animal real" }
-            ]}
+            {
+                title: "المهن - Meslekler",
+                words: [
+                    { tr: "Çiftçi", ar: "مزارع", img: "https://images.pexels.com/photos/2123011/pexels-photo-2123011.jpeg?auto=compress&cs=tinysrgb&w=400" },
+                    { tr: "Doktor", ar: "طبيب", img: "https://images.pexels.com/photos/40568/medical-appointment-doctor-healthcare-40568.jpeg?auto=compress&cs=tinysrgb&w=400" },
+                    { tr: "Ressam", ar: "رسام", img: "https://images.pexels.com/photos/102127/pexels-photo-102127.jpeg?auto=compress&cs=tinysrgb&w=400" },
+                    { tr: "Mühendis", ar: "مهندس", img: "https://images.pexels.com/photos/3184418/pexels-photo-3184418.jpeg?auto=compress&cs=tinysrgb&w=400" }
+                ]
+            }
         ];
 
-        let currentScore = parseInt(localStorage.getItem('paradise_score') || '0');
-        let currentWordsList = [];
         let currentIndex = 0;
+        let score = parseInt(localStorage.getItem('p_score') || '0');
 
-        window.onload = () => {
-            setTimeout(() => { document.getElementById('loading-overlay').classList.add('hidden'); }, 1500);
-            document.getElementById('score-display').innerText = currentScore;
-            showCategories();
-        };
-
-        function showCategories() {
-            let html = `<div class="grid grid-cols-2 gap-4 mt-6">`;
-            data.forEach(cat => {
-                html += `
-                    <div onclick="startLesson('${cat.id}')" class="category-card p-6 rounded-3xl text-center">
-                        <div class="text-4xl mb-3">${cat.icon}</div>
-                        <div class="font-bold text-sm">${cat.title}</div>
-                        <div class="text-[10px] text-gray-400 mt-1">${cat.words.length} كلمات</div>
-                    </div>`;
-            });
-            html += `</div>`;
-            document.getElementById('main-content').innerHTML = html;
-        }
-
-        function startLesson(id) {
-            const category = data.find(c => c.id === id);
-            currentWordsList = category.words;
-            currentIndex = 0;
-            renderCard();
-        }
-
-        async function renderCard() {
-            const word = currentWordsList[currentIndex];
-            
-            // جلب الصورة الواقعية تلقائياً
-            const imageUrl = `https://source.unsplash.com/featured/?${encodeURIComponent(word.search)}`;
-
-            document.getElementById('main-content').innerHTML = `
-                <div class="mt-8 p-6 rounded-[35px] bg-white/10 text-center border border-white/20 relative">
-                    <img src="${imageUrl}" class="word-image" alt="loading real image..." onerror="this.src='https://via.placeholder.com/250x200?text=Error+Loading+Image'">
-                    <div class="tr-text text-4xl font-bold gold-gradient mb-2 uppercase">${word.tr}</div>
-                    <div class="text-xl text-gray-300 mb-8">${word.ar}</div>
+        function showWords() {
+            const word = data[0].words[currentIndex];
+            document.getElementById('content').innerHTML = `
+                <div class="card p-6 text-center mt-10">
+                    <img src="${word.img}" class="word-image" alt="word-img">
+                    <div class="turkish-text text-4xl mb-2">${word.tr}</div>
+                    <div class="text-xl text-gray-300 mb-6">${word.ar}</div>
                     
-                    <button onclick="speak('${word.tr}')" class="bg-gold-gradient w-16 h-16 rounded-full mx-auto flex items-center justify-center shadow-lg active:scale-90 transition-all mb-8">
-                        <span class="text-2xl">🔊</span>
-                    </button>
-
-                    <div class="flex justify-between gap-3">
-                        <button onclick="prevWord()" class="flex-1 py-4 border border-white/20 rounded-2xl font-bold ${currentIndex === 0 ? 'opacity-20' : ''}">السابق</button>
-                        <button onclick="nextWord()" class="flex-[2] py-4 bg-gold-gradient text-purple-900 font-bold rounded-2xl shadow-lg">التالي</button>
+                    <button onclick="speak('${word.tr}')" class="bg-[#c28d75] w-14 h-14 rounded-full mx-auto mb-8 flex items-center justify-center text-2xl shadow-lg">🔊</button>
+                    
+                    <div class="flex gap-3">
+                        <button onclick="prev()" class="flex-1 py-4 bg-white/5 rounded-2xl border border-white/10">السابق</button>
+                        <button onclick="next()" class="flex-[2] py-4 bg-[#c28d75] text-purple-900 font-bold rounded-2xl">التالي</button>
                     </div>
                 </div>
             `;
+            document.getElementById('score').innerText = score;
         }
 
         function speak(text) {
             window.speechSynthesis.cancel();
-            const msg = new SpeechSynthesisUtterance(text);
-            msg.lang = 'tr-TR';
-            msg.rate = 0.7;
-            window.speechSynthesis.speak(msg);
+            let utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'tr-TR';
+            utterance.rate = 0.8;
+            window.speechSynthesis.speak(utterance);
         }
 
-        function nextWord() {
-            updateScore(10);
-            if(currentIndex < currentWordsList.length - 1) {
+        function next() {
+            score += 10;
+            localStorage.setItem('p_score', score);
+            if (currentIndex < data[0].words.length - 1) {
                 currentIndex++;
-                renderCard();
+                showWords();
             } else {
-                alert("أحسنت! أكملت القسم 👑");
-                showCategories();
+                alert("أحسنت! أنهيت المرحلة 👑");
+                currentIndex = 0;
+                showWords();
             }
         }
 
-        function prevWord() {
-            if(currentIndex > 0) {
+        function prev() {
+            if (currentIndex > 0) {
                 currentIndex--;
-                renderCard();
+                showWords();
             }
         }
 
-        function updateScore(p) {
-            currentScore += p;
-            localStorage.setItem('paradise_score', currentScore);
-            document.getElementById('score-display').innerText = currentScore;
-        }
+        // تشغيل الموقع
+        showWords();
     </script>
 </body>
 </html>
