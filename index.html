@@ -193,7 +193,12 @@
             { id: "abstract_concepts", title: "مفاهيم عقلية", icon: "💭", words: [{ tr: "Fikir", ar: "فكرة", img: "💡" }, { tr: "Hayal", ar: "خيال", img: "💭" }, { tr: "Bilgi", ar: "معلومة", img: "ℹ️" }, { tr: "Gerçek", ar: "حقيقة", img: "✔️" }, { tr: "Yalan", ar: "كذب", img: "❌" }, { tr: "Sevgi", ar: "حب", img: "💖" }, { tr: "Saygı", ar: "احترام", img: "🤝" }, { tr: "Güven", ar: "ثقة", img: "🛡️" }, { tr: "Başarı", ar: "نجاح", img: "🏆" }, { tr: "Huzur", ar: "هدوء/سلام", img: "🕊️" }]},
             { id: "emergency_help", title: "الطوارئ", icon: "🚨", words: [{ tr: "imdat", ar: "النجدة", img: "🆘" }, { tr: "Yardım", ar: "مساعدة", img: "🤝" }, { tr: "Tehlike", ar: "خطر", img: "⚠️" }, { tr: "Yangın", ar: "حريق", img: "🔥" }, { tr: "Kaza", ar: "حادث", img: "🚗" }, { tr: "itfaiye", ar: "إطفاء", img: "🚒" }, { tr: "Kayıp", ar: "ضائع", img: "🔍" }, { tr: "Dikkat", ar: "انتباه", img: "❗" }, { tr: "Dur", ar: "قف", img: "🛑" }, { tr: "Polis", ar: "شرطة", img: "👮" }]},
             { id: "directions_map", title: "الاتجاهات", icon: "🧭", words: [{ tr: "Sağ", ar: "يمين", img: "➡️" }, { tr: "Sol", ar: "يسار", img: "⬅️" }, { tr: "ön", ar: "أمام", img: "⬆️" }, { tr: "Arka", ar: "خلف", img: "⬇️" }, { tr: "üst", ar: "فوق", img: "⤴️" }, { tr: "Alt", ar: "تحت", img: "⤵️" }, { tr: "Kuzey", ar: "شمال", img: "🧭" }, { tr: "Güney", ar: "جنوب", img: "🧭" }, { tr: "Doğu", ar: "شرق", img: "🧭" }, { tr: "Batı", ar: "غرب", img: "🧭" }]}
-        ];
+        ];data.forEach(category => {
+category.words.forEach(word =>{
+if (word.img.startWith('http')){
+word.img = `img src="${word.img}" style="width:1.2em; height:1.2em;}
+});
+});
 
         let currentScore = parseInt(localStorage.getItem('paradise_score') || '0');
         const mainContent = document.getElementById('main-content');
