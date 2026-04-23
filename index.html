@@ -1,100 +1,219 @@
 <!DOCTYPE html>
-<html lang="tr" dir="rtl">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Paradise Türk</title>
+    <title>Paradise Türk - VIP Learning</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #4a2b4d; --gold: #c28d75; }
-        body { font-family: 'Tajawal', sans-serif; background-color: var(--primary); color: white; margin: 0; }
-        .gold-text { color: var(--gold); }
-        .card { background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(194, 141, 117, 0.3); border-radius: 30px; }
-        .word-image { width: 100%; height: 220px; object-fit: cover; border-radius: 20px; margin-bottom: 15px; border: 2px solid var(--gold); }
-        /* تصحيح عرض النص التركي */
-        .turkish-text { direction: ltr !important; text-transform: none !important; font-family: Arial, sans-serif; font-weight: bold; }
+        :root {
+            --primary-purple: #4a2b4d;
+            --accent-gold: #c28d75;
+            --soft-gold: #e5c3b3;
+            --white: #ffffff;
+        }
+
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: var(--primary-purple);
+            color: var(--white);
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        .gold-gradient {
+            background: linear-gradient(135deg, var(--accent-gold), var(--soft-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .bg-gold-gradient {
+            background: linear-gradient(135deg, var(--accent-gold), var(--soft-gold));
+        }
+
+        .card-shadow { box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+
+        .category-card {
+            transition: all 0.3s ease;
+            border: 1px solid rgba(194, 141, 117, 0.3);
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-gold);
+            background-color: rgba(194, 141, 117, 0.1);
+        }
+
+        .word-image {
+            width: 100%;
+            height: 100%;
+            object-cover: cover;
+            border-radius: 12px;
+        }
+
+        #auth-overlay, #loading-overlay {
+            background: var(--primary-purple);
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
         .hidden { display: none !important; }
+        
+        /* تحسين مظهر بطاقة الكلمة */
+        .word-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
     </style>
 </head>
 <body>
 
-    <div id="app" class="max-w-md mx-auto min-h-screen p-5">
-        <header class="flex justify-between items-center py-5">
-            <div class="text-xl font-bold uppercase">PARADISE <span class="gold-text">TÜRK</span></div>
-            <div class="bg-white/10 px-4 py-1 rounded-full border border-white/20">
-                <span id="score">0</span> 👑
+    <div id="loading-overlay">
+        <div class="text-center">
+            <div class="text-6xl mb-4">👑</div>
+            <h2 class="text-2xl font-bold gold-gradient uppercase tracking-widest">Paradise Türk</h2>
+        </div>
+    </div>
+
+    <div id="auth-overlay" class="hidden">
+        <div class="bg-white/5 border border-white/10 p-8 rounded-3xl shadow-2xl w-full max-w-sm text-center card-shadow">
+            <div class="text-5xl mb-4">👑</div>
+            <h2 class="text-xl font-bold gold-gradient mb-2 uppercase">دخول طلاب باراديس VIP</h2>
+            <input type="email" id="user-email" placeholder="البريد الإلكتروني" 
+                   class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl mb-4 text-center text-white outline-none">
+            <button onclick="verifyAccess()" id="login-btn" class="w-full bg-gold-gradient text-[#4a2b4d] font-bold py-3 rounded-xl shadow-lg">
+                فتح البوابة
+            </button>
+            <p id="auth-msg" class="text-red-400 mt-4 text-sm hidden"></p>
+        </div>
+    </div>
+
+    <div id="app" class="max-w-md mx-auto min-h-screen flex flex-col p-4 pb-20 hidden">
+        <header class="flex justify-between items-center py-6">
+            <div class="flex flex-col">
+                <h1 class="text-2xl font-bold tracking-tighter uppercase leading-none">PARADISE<span class="text-[#c28d75]">TÜRK</span></h1>
+                <p class="text-[10px] text-gray-300 tracking-[0.2em]">LANGUAGE EDUCATION</p>
+            </div>
+            <div class="bg-white/10 p-2 rounded-full flex items-center gap-2 px-3 border border-white/20">
+                <span class="text-sm font-bold" id="score-display">0</span>
+                <span class="text-lg">👑</span>
             </div>
         </header>
 
-        <div id="content"></div>
+        <main id="main-content" class="flex-grow"></main>
+
+        <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-[#3a223c] border-t border-white/10 p-3 flex justify-around">
+            <button onclick="showCategories()" class="flex flex-col items-center gap-1">
+                <span class="text-xl">🏠</span>
+                <span class="text-[10px]">الرئيسية</span>
+            </button>
+            <button onclick="showProfile()" class="flex flex-col items-center gap-1 opacity-50">
+                <span class="text-xl">👤</span>
+                <span class="text-[10px]">بروفايلي</span>
+            </button>
+        </nav>
     </div>
 
     <script>
+        const SCRIPT_URL = "رابط_جوجل_سكريبت_الخاص_بك";
+        
+        // نظام البيانات الذكي: نضيف الكلمة بالإنجليزية (en) لجلب الصورة بدقة
         const data = [
-            {
-                title: "المهن - Meslekler",
-                words: [
-                    { tr: "Çiftçi", ar: "مزارع", img: "https://images.pexels.com/photos/2123011/pexels-photo-2123011.jpeg?auto=compress&cs=tinysrgb&w=400" },
-                    { tr: "Doktor", ar: "طبيب", img: "https://images.pexels.com/photos/40568/medical-appointment-doctor-healthcare-40568.jpeg?auto=compress&cs=tinysrgb&w=400" },
-                    { tr: "Ressam", ar: "رسام", img: "https://images.pexels.com/photos/102127/pexels-photo-102127.jpeg?auto=compress&cs=tinysrgb&w=400" },
-                    { tr: "Mühendis", ar: "مهندس", img: "https://images.pexels.com/photos/3184418/pexels-photo-3184418.jpeg?auto=compress&cs=tinysrgb&w=400" }
-                ]
-            }
+            { id: "fruits", title: "الفواكه", icon: "🍎", words: [
+                { tr: "Elma", ar: "تفاح", en: "apple", img: "🍎" },
+                { tr: "Muz", ar: "موز", en: "banana", img: "🍌" },
+                { tr: "Çilek", ar: "فراولة", en: "strawberry", img: "🍓" },
+                // ... كرري حتى 10 كلمات لكل موضوع
+            ]},
+            { id: "animals", title: "الحيوانات", icon: "🦁", words: [
+                { tr: "Kedi", ar: "قطة", en: "cat", img: "🐱" },
+                { tr: "Köpek", ar: "كلب", en: "dog", img: "🐶" },
+                // ...
+            ]},
+            // أضيفي الـ 50 موضوعاً هنا بنفس النمط
         ];
 
-        let currentIndex = 0;
-        let score = parseInt(localStorage.getItem('p_score') || '0');
+        let currentScore = parseInt(localStorage.getItem('paradise_score') || '0');
+        const mainContent = document.getElementById('main-content');
 
-        function showWords() {
-            const word = data[0].words[currentIndex];
-            document.getElementById('content').innerHTML = `
-                <div class="card p-6 text-center mt-10">
-                    <img src="${word.img}" class="word-image" alt="word-img">
-                    <div class="turkish-text text-4xl mb-2">${word.tr}</div>
-                    <div class="text-xl text-gray-300 mb-6">${word.ar}</div>
-                    
-                    <button onclick="speak('${word.tr}')" class="bg-[#c28d75] w-14 h-14 rounded-full mx-auto mb-8 flex items-center justify-center text-2xl shadow-lg">🔊</button>
-                    
-                    <div class="flex gap-3">
-                        <button onclick="prev()" class="flex-1 py-4 bg-white/5 rounded-2xl border border-white/10">السابق</button>
-                        <button onclick="next()" class="flex-[2] py-4 bg-[#c28d75] text-purple-900 font-bold rounded-2xl">التالي</button>
-                    </div>
-                </div>
-            `;
-            document.getElementById('score').innerText = score;
-        }
-
+        // دالة النطق
         function speak(text) {
             window.speechSynthesis.cancel();
-            let utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'tr-TR';
-            utterance.rate = 0.8;
-            window.speechSynthesis.speak(utterance);
+            const msg = new SpeechSynthesisUtterance(text);
+            msg.lang = 'tr-TR';
+            window.speechSynthesis.speak(msg);
         }
 
-        function next() {
-            score += 10;
-            localStorage.setItem('p_score', score);
-            if (currentIndex < data[0].words.length - 1) {
-                currentIndex++;
-                showWords();
-            } else {
-                alert("أحسنت! أنهيت المرحلة 👑");
-                currentIndex = 0;
-                showWords();
-            }
+        // عرض الكلمات مع حل مشكلة الصور
+        function showWords(catId) {
+            const category = data.find(c => c.id === catId);
+            mainContent.innerHTML = `
+                <div class="flex items-center gap-3 mb-6 mt-4">
+                    <button onclick="showCategories()" class="text-2xl text-gold-gradient">🔙</button>
+                    <h2 class="text-xl font-bold gold-gradient">${category.title}</h2>
+                </div>
+                <div class="grid grid-cols-1 gap-4">
+                    ${category.words.map(word => `
+                        <div onclick="handleWordClick('${word.tr}')" class="word-card flex items-center p-3 rounded-2xl gap-4 cursor-pointer active:scale-95 transition-all">
+                            <div class="relative w-20 h-20 flex-shrink-0 bg-white/10 rounded-xl overflow-hidden flex items-center justify-center">
+                                <span class="absolute text-2xl z-0">${word.img}</span>
+                                <img src="https://source.unsplash.com/200x200/?${word.en}" 
+                                     class="relative z-10 w-full h-full object-cover" 
+                                     onerror="this.style.display='none'"
+                                     loading="lazy">
+                            </div>
+                            <div class="flex-grow text-right">
+                                <div class="text-lg font-bold">${word.tr}</div>
+                                <div class="text-sm text-gray-400">${word.ar}</div>
+                            </div>
+                            <div class="text-xl">🔊</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            window.scrollTo(0,0);
         }
 
-        function prev() {
-            if (currentIndex > 0) {
-                currentIndex--;
-                showWords();
-            }
+        function handleWordClick(text) {
+            speak(text);
+            currentScore += 1;
+            localStorage.setItem('paradise_score', currentScore);
+            document.getElementById('score-display').innerText = currentScore;
         }
 
-        // تشغيل الموقع
-        showWords();
+        function showCategories() {
+            mainContent.innerHTML = `
+                <div class="grid grid-cols-2 gap-4 mt-6">
+                    ${data.map(cat => `
+                        <div onclick="showWords('${cat.id}')" class="category-card p-6 rounded-3xl text-center bg-white/5 cursor-pointer">
+                            <div class="text-4xl mb-2">${cat.icon}</div>
+                            <h3 class="font-bold text-sm gold-gradient">${cat.title}</h3>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        async function verifyAccess() {
+            // كود التحقق الخاص بكِ كما هو
+            document.getElementById('auth-overlay').classList.add('hidden');
+            document.getElementById('app').classList.remove('hidden');
+            showCategories();
+        }
+
+        window.onload = () => {
+            setTimeout(() => {
+                document.getElementById('loading-overlay').classList.add('hidden');
+                document.getElementById('auth-overlay').classList.remove('hidden');
+            }, 2000);
+        };
     </script>
 </body>
 </html>
