@@ -438,15 +438,6 @@
 
 loadProgress();
         
-        function saveTest() {
-  let email = "test@gmail.com";
-
-  fetch("https://kelime-hazinesi-337e8-default-rtdb.firebaseio.com/progress/" + email + ".json", {
-    method: "PUT",
-    body: JSON.stringify({ score: 10 })
-  });
-};
-        saveTest();
     </script>
 </body>
 </html>
