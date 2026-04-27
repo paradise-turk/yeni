@@ -201,7 +201,7 @@
     }
     category.words.forEach(word => {
         if (word.img.startsWith('http')) {
-            word.img = <img src="${word.img}" style="width:1.4em; height:1.4em; vertical-align:middle; object-fit:contain;">;
+            word.img = `<img src="${word.img}" style="width:1.4em; height:1.4em; vertical-align:middle; object-fit:contain;">`;
         }
     });
 });
