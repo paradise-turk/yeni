@@ -195,16 +195,16 @@
             { id: "directions_map", title: "الاتجاهات", icon: "🧭", words: [{ tr: "Sağ", ar: "يمين", img: "https://img.icons8.com/?size=100&id=CMWts1cpsnVn&format=png&color=000000" }, { tr: "Sol", ar: "يسار", img: "https://img.icons8.com/?size=100&id=gkW5yexEuzan&format=png&color=000000" }, { tr: "ön", ar: "أمام", img: "https://img.icons8.com/?size=100&id=ijEOz9F5NVdY&format=png&color=000000" }, { tr: "Arka", ar: "خلف", img: "https://img.icons8.com/?size=100&id=7tuqmFP5H9nT&format=png&color=000000" }, { tr: "üst", ar: "فوق", img: "https://img.icons8.com/?size=100&id=zl9MbXJoobYc&format=png&color=000000" }, { tr: "Alt", ar: "تحت", img: "https://img.icons8.com/?size=100&id=dE0rA5BumrFk&format=png&color=000000" }, { tr: "Kuzey", ar: "شمال", img: "https://img.icons8.com/?size=100&id=2u7sA_cU4JNF&format=png&color=000000" }, { tr: "Güney", ar: "جنوب", img: "https://img.icons8.com/?size=100&id=b68kqShAUNgD&format=png&color=000000" }, { tr: "Doğu", ar: "شرق", img: "https://img.icons8.com/?size=100&id=tVKbGh0JIDf9&format=png&color=000000" }, { tr: "Batı", ar: "غرب", img: "https://img.icons8.com/?size=100&id=l51u8TYPPCbP&format=png&color=000000" }]}
         ];
         
-     data.forEach(category => {
+    data.forEach(category => {
     if (category.icon.startsWith('http')) {
-        category.icon = `<img src="${category.icon}" style="width:1.4em; height:1.4em; vertical-align:middle; object-fit:contain;">`;
-        }‎
-‎    category.words.forEach(word => {‎
-‎        if (word.img.startsWith('http')) {‎
-‎            word.img = `<img src="${word.img}" style="width:1.4em; height:1.4em; vertical-‎align:middle; object-fit:contain;">`;‎
-‎        }‎
-‎    });‎
-‎});‎
+        category.icon = <img src="${category.icon}" style="width:1.4em; height:1.4em; vertical-align:middle; object-fit:contain;">;
+    }
+    category.words.forEach(word => {
+        if (word.img.startsWith('http')) {
+            word.img = <img src="${word.img}" style="width:1.4em; height:1.4em; vertical-align:middle; object-fit:contain;">;
+        }
+    });
+});
 ‎        ‎
 ‎        let currentScore = parseInt(localStorage.getItem('paradise_score') || '0');‎
 ‎        const mainContent = document.getElementById('main-content');‎
