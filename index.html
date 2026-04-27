@@ -437,6 +437,8 @@ then(data => {
   document.getElementById("score-display").innerText = data?.score || 0;
 });
 loadProgress();
+        let email = localStorage.getItem("email");
+console.log(email);
     </script>
 </body>
 </html>
