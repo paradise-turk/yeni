@@ -202,9 +202,9 @@
     category.words.forEach(word => {
         if (word.img.startsWith('http')) {
             word.img = `<img src="${word.img}" style="width:1.4em; height:1.4em; vertical-align:middle; object-fit:contain;">`;
-        }
-    });  
- }); 
+      }
+    });
+});
 ‎        let currentScore = parseInt(localStorage.getItem('paradise_score') || '0');‎
 ‎        const mainContent = document.getElementById('main-content');‎
 ‎        const scoreDisplay = document.getElementById('score-display');‎
