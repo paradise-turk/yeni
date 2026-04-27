@@ -194,15 +194,14 @@
             { id: "emergency_help", title: "الطوارئ", icon: "🚨", words: [{ tr: "imdat", ar: "النجدة", img: "🆘" }, { tr: "Yardım", ar: "مساعدة", img: "https://img.icons8.com/?size=100&id=Rn8iphD383Zu&format=png&color=000000" }, { tr: "Tehlike", ar: "خطر", img: "⚠️" }, { tr: "Yangın", ar: "حريق", img: "🔥" }, { tr: "Kaza", ar: "حادث", img: "https://img.icons8.com/?size=100&id=4r9lkQjMeDp0&format=png&color=000000" }, { tr: "itfaiye", ar: "الإطفاء", img: "https://img.icons8.com/?size=100&id=DGjYwjiGe4Nk&format=png&color=000000" }, { tr: "Kayıp", ar: "ضائع", img: "🔍" }, { tr: "Dikkat", ar: "انتباه", img: "❗" }, { tr: "Dur", ar: "قف", img: "https://img.icons8.com/?size=100&id=WD8YTtf61HTa&format=png&color=000000" }, { tr: "Polis", ar: "الشرطة", img: "https://img.icons8.com/?size=100&id=ukQdEZnYPhAF&format=png&color=000000" }]},
             { id: "directions_map", title: "الاتجاهات", icon: "🧭", words: [{ tr: "Sağ", ar: "يمين", img: "https://img.icons8.com/?size=100&id=CMWts1cpsnVn&format=png&color=000000" }, { tr: "Sol", ar: "يسار", img: "https://img.icons8.com/?size=100&id=gkW5yexEuzan&format=png&color=000000" }, { tr: "ön", ar: "أمام", img: "https://img.icons8.com/?size=100&id=ijEOz9F5NVdY&format=png&color=000000" }, { tr: "Arka", ar: "خلف", img: "https://img.icons8.com/?size=100&id=7tuqmFP5H9nT&format=png&color=000000" }, { tr: "üst", ar: "فوق", img: "https://img.icons8.com/?size=100&id=zl9MbXJoobYc&format=png&color=000000" }, { tr: "Alt", ar: "تحت", img: "https://img.icons8.com/?size=100&id=dE0rA5BumrFk&format=png&color=000000" }, { tr: "Kuzey", ar: "شمال", img: "https://img.icons8.com/?size=100&id=2u7sA_cU4JNF&format=png&color=000000" }, { tr: "Güney", ar: "جنوب", img: "https://img.icons8.com/?size=100&id=b68kqShAUNgD&format=png&color=000000" }, { tr: "Doğu", ar: "شرق", img: "https://img.icons8.com/?size=100&id=tVKbGh0JIDf9&format=png&color=000000" }, { tr: "Batı", ar: "غرب", img: "https://img.icons8.com/?size=100&id=l51u8TYPPCbP&format=png&color=000000" }]}
         ];
-        
-    data.forEach(category => {
+      data.forEach(category => {
     if (category.icon.startsWith('http')) {
         category.icon = `<img src="${category.icon}" style="width:1.4em; height:1.4em; vertical-align:middle; object-fit:contain;">`;
     }
     category.words.forEach(word => {
         if (word.img.startsWith('http')) {
             word.img = `<img src="${word.img}" style="width:1.4em; height:1.4em; vertical-align:middle; object-fit:contain;">`;
-      }
+        }
     });
 });
 ‎        let currentScore = parseInt(localStorage.getItem('paradise_score') || '0');‎
