@@ -433,7 +433,9 @@
     .then(res => res.json())
     .then(data => {});
 }
-
+.then(data => {
+  document.getElementById("score-display").innerText = data?.score || 0;
+});
 loadProgress();
     </script>
 </body>
