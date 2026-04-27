@@ -426,6 +426,15 @@
                 }
             }, 1500);
         };
+        function loadProgress() {
+  let email = localStorage.getItem("email");
+
+  fetch("https://kelime-hazinesi-337e8-default-rtdb.firebaseio.com/progress/" + email + ".json")
+    .then(res => res.json())
+    .then(data => {});
+}
+
+loadProgress();
     </script>
 </body>
 </html>
