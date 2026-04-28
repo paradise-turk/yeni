@@ -231,6 +231,17 @@
             btn.innerText = "جاري التحقق...";
             btn.disabled = true;
             msg.classList.add('hidden');
+            const adminEmails = ["paradise.aaie@gmail.com"];
+
+if (adminEmails.includes(emailInput)) {
+    localStorage.setItem('paradise_access_granted', 'true');
+    localStorage.setItem("email", emailInput);
+    document.getElementById('auth-overlay').classList.add('hidden');
+    document.getElementById('app').classList.remove('hidden');
+    showCategories();
+    loadProgress();
+    return;
+}
 
             try {
                 const response = await fetch(`${SCRIPT_URL}?email=${encodeURIComponent(emailInput)}&t=${new Date().getTime()}`);
